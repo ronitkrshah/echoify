@@ -1,4 +1,5 @@
 import PipedApi from "./PipedApi";
-import { TSearchVideoResult } from "./types/TSearchResponse";
+import { TSearchVideo } from "./types/TSearchVideo";
+import { TSearchPlaylist } from "./types/TSearchPlaylist";
 
-export { PipedApi, TSearchVideoResult };
+export { PipedApi, TSearchVideo, TSearchPlaylist };

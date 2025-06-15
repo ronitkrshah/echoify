@@ -1,4 +1,4 @@
-export type TSearchVideoResult = {
+export type TSearchVideo = {
   url: string;
   type: string;
   title: string;

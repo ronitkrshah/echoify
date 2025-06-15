@@ -6,9 +6,13 @@ import { useEffect } from "react";
 import { LocalStorage } from "./utils";
 import { PersistanceKeys } from "./constants";
 import { PipedApi } from "./api";
+import { MusicPlayerService } from "./services";
+import { StatusBar } from "expo-status-bar";
 
 export default function App() {
   useEffect(() => {
+    MusicPlayerService.setupTrackPlayer();
+
     const instanceUrl = LocalStorage.getItem(PersistanceKeys.PIPED_INSTANCE);
     if (instanceUrl) {
       PipedApi.setPipedApiUrl(instanceUrl);
@@ -17,6 +21,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
+      <StatusBar animated style="auto" />
       <MaterialYouTheme>
         <LoadingDialogProvider>
           <SafeAreaView style={{ flex: 1 }}>

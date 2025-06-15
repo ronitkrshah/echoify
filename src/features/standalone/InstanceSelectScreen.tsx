@@ -2,10 +2,14 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { Button, RadioButton, Text, useTheme } from "react-native-paper";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { useState } from "react";
-import { LocalStorage, sleepThreadAsync } from "~/utils";
+import { asyncFuncExecutor, LocalStorage, sleepThreadAsync } from "~/utils";
 import { PersistanceKeys } from "~/constants";
 import { PipedApi } from "~/api";
 import { useLoadingDialog } from "~/core/components";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { TStackNavigationRoutes } from "~/navigation";
+
+type TProps = NativeStackScreenProps<TStackNavigationRoutes, "InstanceSelectScreen">;
 
 const _pipedPublicInstances = [
   "https://pipedapi.kavin.rocks",
@@ -26,7 +30,7 @@ const _pipedPublicInstances = [
   "https://pipedapi.orangenet.cc",
 ];
 
-export default function InstanceSelectScreen() {
+export default function InstanceSelectScreen({ navigation }: TProps) {
   const [selectedInstance, setSelectedInstance] = useState(_pipedPublicInstances[0]);
   const theme = useTheme();
   const loadingDialog = useLoadingDialog();
@@ -36,12 +40,10 @@ export default function InstanceSelectScreen() {
     LocalStorage.setItem(PersistanceKeys.PIPED_INSTANCE, selectedInstance);
     loadingDialog.show("Checking Instance Response...");
 
-    try {
-      const data = await PipedApi.searchVideoAsync("Russian Bandanna");
-    } catch (error) {
-      // pass for now
-    } finally {
-      loadingDialog.dismiss();
+    const [data, err] = await asyncFuncExecutor(() => PipedApi.searchVideosAsync("Rick Roll"));
+    loadingDialog.dismiss();
+    if (data) {
+      navigation.replace("BottomTabNavigation", { screen: "TrendingScreen" });
     }
   }
 
