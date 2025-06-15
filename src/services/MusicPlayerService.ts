@@ -5,7 +5,7 @@ import TrackPlayer, {
   RatingType,
 } from "react-native-track-player";
 
-class PlayerService {
+class MusicPlayerService {
   private _isTrackPlayerReady = false;
 
   public async initializePlayerEvents() {
@@ -50,5 +50,4 @@ class PlayerService {
 }
 
 /** Exporting a singleton instance */
-const MusicPlayerService = new PlayerService();
-export default MusicPlayerService;
+export default new MusicPlayerService();

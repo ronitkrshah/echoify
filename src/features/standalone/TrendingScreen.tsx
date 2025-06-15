@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FlatList, Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
-import { Searchbar, Text, useTheme } from "react-native-paper";
+import { Text, useTheme } from "react-native-paper";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { CompositeScreenProps } from "@react-navigation/native";
 import { NativeBottomTabScreenProps } from "@bottom-tabs/react-navigation";
@@ -15,27 +15,27 @@ type TProps = CompositeScreenProps<
 >;
 
 export default function TrendingScreen({ navigation }: TProps) {
-  const [query, setQuery] = useState("");
   const [trendingVideos, setTrendingVideos] = useState<TSearchPlaylist[]>([]);
 
   const theme = useTheme();
 
   useEffect(() => {
-    PipedApi.searchPlaylistsAsync("2025 Trending Bollywood")
-      .then(setTrendingVideos)
-      .catch(console.log);
+    // PipedApi.searchPlaylistsAsync("2025 Trending Bollywood")
+    //   .then(setTrendingVideos)
+    //   .catch(console.log);
   }, []);
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Searchbar
-        value={query}
-        placeholder="Search Songs..."
-        onChangeText={setQuery}
-        onSubmitEditing={() => {
-          navigation.push("SearchScreen", { query });
+    <View style={styles.container}>
+      <Pressable
+        style={[{ backgroundColor: theme.colors.elevation.level5 }, styles.searchBar]}
+        onPress={() => {
+          navigation.push("SearchScreen");
         }}
-      />
+      >
+        <MaterialDesignIcons name="magnify" size={24} />
+        <Text variant="titleMedium">Search Songs...</Text>
+      </Pressable>
       <ScrollView>
         <View style={{ gap: 16 }}>
           <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
@@ -93,5 +93,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 30,
     overflow: "hidden",
+  },
+  searchBar: {
+    borderRadius: 60,
+    flexDirection: "row",
+    padding: 16,
+    gap: 16,
   },
 });

@@ -1,14 +1,14 @@
 import { TSearchPlaylist } from "./types/TSearchPlaylist";
 import { TSearchVideo } from "./types/TSearchVideo";
 
-export default class PipedApi {
-  private static _url: string | undefined = undefined;
+class PipedApi {
+  private _url: string | undefined = undefined;
 
-  public static setPipedApiUrl(url: string) {
+  public setPipedApiUrl(url: string) {
     this._url = url;
   }
 
-  private static async searchYoutubeData<T>(query: string, filterOption: string): Promise<T> {
+  private async searchWithQueryAsync<T>(query: string, filterOption: string): Promise<T> {
     const queryParam = new URLSearchParams();
     queryParam.append("q", query);
     queryParam.append("filter", filterOption);
@@ -17,15 +17,15 @@ export default class PipedApi {
     return (await response.json()).items;
   }
 
-  public static async searchVideosAsync(query: string) {
-    return await this.searchYoutubeData<TSearchVideo[]>(query, "videos");
+  public async searchVideosAsync(query: string): Promise<TSearchVideo[]> {
+    return await this.searchWithQueryAsync<TSearchVideo[]>(query, "videos");
   }
 
-  public static async searchPlaylistsAsync(query: string) {
-    return await this.searchYoutubeData<TSearchPlaylist[]>(query, "playlists");
+  public async searchPlaylistsAsync(query: string): Promise<TSearchPlaylist[]> {
+    return await this.searchWithQueryAsync<TSearchPlaylist[]>(query, "playlists");
   }
 
-  public static async getVideoStreamingInfoAsync(videoUrl: string) {
+  public async getVideoStreamingInfoAsync(videoUrl: string) {
     const videoId = videoUrl.split("=").pop();
 
     if (videoId) {
@@ -33,4 +33,13 @@ export default class PipedApi {
       return await response.json();
     }
   }
+
+  public async getSearchSuggestionsAsync(query: string): Promise<string[]> {
+    const queryParams = new URLSearchParams();
+    queryParams.append("query", query);
+    const response = await fetch(`${this._url}/suggestions?${queryParams.toString()}}`);
+    return await response.json();
+  }
 }
+
+export default new PipedApi();

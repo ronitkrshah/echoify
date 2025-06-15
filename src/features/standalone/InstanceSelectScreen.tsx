@@ -48,7 +48,7 @@ export default function InstanceSelectScreen({ navigation }: TProps) {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={styles.container}>
       <View style={styles.serverIconContainer}>
         <MaterialDesignIcons name="server-outline" size={50} color={theme.colors.primary} />
         <Text variant="titleLarge">Select A Public Instance</Text>

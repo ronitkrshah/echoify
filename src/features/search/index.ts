@@ -1,3 +1,4 @@
+import SearchResultsScreen from "./SearchResultsScreen";
 import SearchScreen from "./SearchScreen";
 
-export { SearchScreen };
+export { SearchResultsScreen, SearchScreen };

@@ -14,6 +14,7 @@ export default function App() {
     MusicPlayerService.setupTrackPlayer();
 
     const instanceUrl = LocalStorage.getItem(PersistanceKeys.PIPED_INSTANCE);
+
     if (instanceUrl) {
       PipedApi.setPipedApiUrl(instanceUrl);
     }
