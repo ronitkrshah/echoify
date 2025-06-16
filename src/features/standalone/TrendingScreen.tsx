@@ -7,19 +7,52 @@ import { NativeBottomTabScreenProps } from "@bottom-tabs/react-navigation";
 import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { TStackNavigationRoutes } from "~/navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { TSearchPlaylist } from "~/api";
+import { PipedApi, TSearchPlaylist } from "~/api";
+import { asyncFuncExecutor } from "~/utils";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "TrendingScreen">,
   NativeStackScreenProps<TStackNavigationRoutes>
 >;
 
-export default function TrendingScreen({ navigation }: TProps) {
-  const [trendingVideos, setTrendingVideos] = useState<TSearchPlaylist[]>([]);
+type TTredingVideosEnum = "Trending" | "Romantic";
+const _trendingSectionIcons = {
+  Trending: "compass",
+  Romantic: "heart-multiple",
+} as const;
 
+export default function TrendingScreen({ navigation }: TProps) {
+  const [trendingVideos, setTrendingVideos] = useState<
+    Record<TTredingVideosEnum, TSearchPlaylist[]>
+  >({
+    Trending: [],
+    Romantic: [],
+  });
   const theme = useTheme();
 
-  useEffect(() => {}, []);
+  async function bootStrapAsync() {
+    const [trendingResult, romanticResult] = await Promise.all([
+      asyncFuncExecutor(() =>
+        PipedApi.searchWithQueryAsync<TSearchPlaylist[]>("2025 Trending Music India", "playlists")
+      ),
+      asyncFuncExecutor(() =>
+        PipedApi.searchWithQueryAsync<TSearchPlaylist[]>("Romantic Music India", "playlists")
+      ),
+    ]);
+
+    const [trending] = trendingResult;
+    const [romantic] = romanticResult;
+
+    setTrendingVideos({
+      Trending: trending ?? [],
+      Romantic: romantic ?? [],
+    });
+  }
+
+  useEffect(() => {
+    bootStrapAsync();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -32,47 +65,81 @@ export default function TrendingScreen({ navigation }: TProps) {
         <MaterialDesignIcons name="magnify" size={24} />
         <Text variant="titleMedium">Search Songs...</Text>
       </Pressable>
-      <ScrollView>
-        <View style={{ gap: 16 }}>
-          <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
-            <MaterialDesignIcons name="compass-outline" size={40} color={theme.colors.primary} />
-            <Text variant="titleLarge" style={{ color: theme.colors.primary }}>
-              Trending
-            </Text>
-          </View>
-
-          <FlatList
-            horizontal
-            data={trendingVideos}
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.url}
-            contentContainerStyle={{
-              gap: 16,
-              backgroundColor: theme.colors.inversePrimary,
-              padding: 16,
-              borderRadius: 32,
-            }}
-            renderItem={({ item }) => {
-              return (
-                <Pressable
-                  style={[styles.playlistCard, { backgroundColor: theme.colors.elevation.level5 }]}
+      <ScrollView
+        style={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ gap: 30 }}
+      >
+        {Object.entries(trendingVideos).map(([key, value], entryIndex) => {
+          if (value.length === 0) return null;
+          return (
+            <View key={key} style={{ gap: 16 }}>
+              <Animated.View
+                entering={FadeIn}
+                style={{ flexDirection: "row", alignItems: "center", gap: 16 }}
+              >
+                <MaterialDesignIcons
+                  name={_trendingSectionIcons[key as keyof typeof _trendingSectionIcons]}
+                  size={40}
+                  color={theme.colors.primary}
+                />
+                <Text
+                  variant="titleLarge"
+                  style={{ color: theme.colors.primary, fontWeight: "bold" }}
                 >
-                  <Image
-                    source={{ uri: item.thumbnail }}
-                    height={140}
-                    width={150}
-                    style={{ borderRadius: 20 }}
-                  />
-                  <View style={{ padding: 8 }}>
-                    <Text variant="titleMedium" numberOfLines={2} style={{ textAlign: "center" }}>
-                      {item.name}
-                    </Text>
-                  </View>
-                </Pressable>
-              );
-            }}
-          />
-        </View>
+                  {key}
+                </Text>
+              </Animated.View>
+
+              <FlatList
+                horizontal
+                data={value}
+                keyExtractor={(item) => item.url}
+                contentContainerStyle={{ gap: 16 }}
+                renderItem={({ item, index }) => {
+                  return (
+                    <Animated.View
+                      style={{ borderRadius: 16, overflow: "hidden" }}
+                      entering={FadeIn.delay(index * 150 * entryIndex)}
+                    >
+                      <Pressable
+                        android_ripple={{ color: theme.colors.primary }}
+                        style={{
+                          width: 140,
+                          gap: 12,
+                          paddingHorizontal: 8,
+                          paddingVertical: 16,
+                        }}
+                      >
+                        <View
+                          style={{
+                            width: 120,
+                            aspectRatio: 1,
+                            overflow: "hidden",
+                            borderRadius: 20,
+                            marginHorizontal: "auto",
+                          }}
+                        >
+                          <Image
+                            source={{ uri: item.thumbnail }}
+                            style={StyleSheet.absoluteFillObject}
+                          />
+                        </View>
+                        <Text
+                          numberOfLines={2}
+                          variant="labelLarge"
+                          style={{ textAlign: "center", height: "auto" }}
+                        >
+                          {item.name}
+                        </Text>
+                      </Pressable>
+                    </Animated.View>
+                  );
+                }}
+              />
+            </View>
+          );
+        })}
       </ScrollView>
     </View>
   );

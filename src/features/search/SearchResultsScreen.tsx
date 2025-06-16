@@ -128,6 +128,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
         }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ gap: 22 }}
+        ListEmptyComponent={<ActivityIndicator />}
         renderItem={({ item, index }) => {
           return (
             <Animated.View
