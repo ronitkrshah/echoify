@@ -1,5 +1,7 @@
-import { TSearchPlaylist } from "./types/TSearchPlaylist";
-import { TSearchVideo } from "./types/TSearchVideo";
+import { TSearchPlaylist } from "./types/playlist";
+import { TSearchVideo } from "./types/video";
+
+type TSearchFilters = "all" | "music_videos" | "playlists" | "music_songs";
 
 class PipedApi {
   private _url: string | undefined = undefined;
@@ -8,21 +10,16 @@ class PipedApi {
     this._url = url;
   }
 
-  private async searchWithQueryAsync<T>(query: string, filterOption: string): Promise<T> {
+  public async searchWithQueryAsync<T>(
+    query: string,
+    filterOption: TSearchFilters = "all"
+  ): Promise<T> {
     const queryParam = new URLSearchParams();
     queryParam.append("q", query);
     queryParam.append("filter", filterOption);
 
     const response = await fetch(`${this._url}/search?${queryParam.toString()}`);
     return (await response.json()).items;
-  }
-
-  public async searchVideosAsync(query: string): Promise<TSearchVideo[]> {
-    return await this.searchWithQueryAsync<TSearchVideo[]>(query, "videos");
-  }
-
-  public async searchPlaylistsAsync(query: string): Promise<TSearchPlaylist[]> {
-    return await this.searchWithQueryAsync<TSearchPlaylist[]>(query, "playlists");
   }
 
   public async getVideoStreamingInfoAsync(videoUrl: string) {

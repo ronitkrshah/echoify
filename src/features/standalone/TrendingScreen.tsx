@@ -7,7 +7,7 @@ import { NativeBottomTabScreenProps } from "@bottom-tabs/react-navigation";
 import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { TStackNavigationRoutes } from "~/navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { PipedApi, TSearchPlaylist } from "~/api";
+import { TSearchPlaylist } from "~/api";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "TrendingScreen">,
@@ -19,11 +19,7 @@ export default function TrendingScreen({ navigation }: TProps) {
 
   const theme = useTheme();
 
-  useEffect(() => {
-    // PipedApi.searchPlaylistsAsync("2025 Trending Bollywood")
-    //   .then(setTrendingVideos)
-    //   .catch(console.log);
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <View style={styles.container}>

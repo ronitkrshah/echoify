@@ -26,6 +26,14 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [["react-native-bottom-tabs", { "theme": "material3-dynamic" }]]
+    "plugins": [
+      [
+        "react-native-bottom-tabs",
+        {
+          "theme": "material3-dynamic"
+        }
+      ],
+      "expo-sqlite"
+    ]
   }
 }

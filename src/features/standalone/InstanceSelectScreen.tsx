@@ -40,7 +40,9 @@ export default function InstanceSelectScreen({ navigation }: TProps) {
     LocalStorage.setItem(PersistanceKeys.PIPED_INSTANCE, selectedInstance);
     loadingDialog.show("Checking Instance Response...");
 
-    const [data, err] = await asyncFuncExecutor(() => PipedApi.searchVideosAsync("Rick Roll"));
+    const [data] = await asyncFuncExecutor(() =>
+      PipedApi.searchWithQueryAsync("Rick Roll", "music_songs")
+    );
     loadingDialog.dismiss();
     if (data) {
       navigation.replace("BottomTabNavigation", { screen: "TrendingScreen" });

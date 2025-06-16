@@ -1,32 +1,83 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { Searchbar, Text, useTheme } from "react-native-paper";
-import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
+import { ILike } from "typeorm/browser";
 import { PipedApi } from "~/api";
+import { Database } from "~/database";
+import { SearchEntity } from "~/database/entities";
 import { useDebounce } from "~/hooks";
+import { asyncFuncExecutor } from "~/utils";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
+import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { TStackNavigationRoutes } from "~/navigation";
-
-const APressable = Animated.createAnimatedComponent(Pressable);
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchScreen">;
 
 export default function SearchScreen({ navigation }: TProps) {
   const [query, setQuery] = useState("");
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<{ suggestion: string; id: number | string }[]>([]);
+
   const debouncedQuery = useDebounce(query);
+
   const theme = useTheme();
 
-  useEffect(() => {
-    if (debouncedQuery.length >= 3) {
-      PipedApi.getSearchSuggestionsAsync(debouncedQuery)
-        .then(setSuggestions)
-        .catch(() => {
-          // Ignore
-        });
-    } else if (debouncedQuery.length === 0) {
-      setSuggestions([]);
+  async function getRecentSearchesFromDatabaseAsync(search: string = "") {
+    const repo = Database.datasource.getRepository(SearchEntity);
+
+    const queryOptions: Record<string, object> = {
+      order: {
+        createdAt: "DESC",
+      },
+    };
+
+    if (search) {
+      queryOptions["where"] = { query: ILike(`%${search}%`) };
     }
+
+    return await repo.find(queryOptions);
+  }
+
+  async function getSuggestionsFromApiAsync(query: string) {
+    const [suggestions] = await asyncFuncExecutor(() => PipedApi.getSearchSuggestionsAsync(query));
+    if (suggestions) {
+      return suggestions.map((it) => ({ id: it, suggestion: it }));
+    }
+    return [];
+  }
+
+  async function removeSearchSuggestionFromDatabaseAsync(id: number) {
+    const repo = Database.datasource.getRepository(SearchEntity);
+    await repo.delete({ id });
+  }
+
+  async function addSearchSuggestionToDatabaseAsync(text: string) {
+    const repo = Database.datasource.getRepository(SearchEntity);
+    const suggestion = new SearchEntity();
+    suggestion.query = text;
+    await repo.save(suggestion);
+  }
+
+  async function bootStrapAsync() {
+    if (debouncedQuery.length < 3) {
+      getRecentSearchesFromDatabaseAsync().then((data) => {
+        setSuggestions(data.map((it) => ({ suggestion: it.query, id: it.id })));
+      });
+    } else {
+      getSuggestionsFromApiAsync(debouncedQuery).then(setSuggestions);
+    }
+  }
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      bootStrapAsync();
+    });
+
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    bootStrapAsync();
   }, [debouncedQuery]);
 
   return (
@@ -34,39 +85,59 @@ export default function SearchScreen({ navigation }: TProps) {
       <Searchbar
         value={query}
         onChangeText={setQuery}
-        placeholder="Search"
-        autoFocus
+        placeholder="Seach Songs"
         onSubmitEditing={() => {
           navigation.push("SearchResultsScreen", { query });
+          addSearchSuggestionToDatabaseAsync(query);
         }}
       />
-      <Animated.ScrollView layout={LinearTransition}>
-        {suggestions.map((it, index) => {
+      <Animated.FlatList
+        layout={LinearTransition}
+        data={suggestions}
+        keyExtractor={(item) => item.id?.toString()}
+        contentContainerStyle={{ paddingVertical: 16 }}
+        renderItem={({ item, index }) => {
+          /**
+           * We storing number and string both for ids. So If it's number then
+           * it comes from db else it's fromapi
+           */
+          const isRecentQuery = typeof item.id === "number";
+
           return (
-            <APressable
-              onPress={() => navigation.push("SearchResultsScreen", { query: it })}
-              entering={FadeIn.delay(index * 100)}
-              key={index.toString()}
-              style={styles.suggestionBox}
-              android_ripple={{ color: theme.colors.primary }}
-            >
-              <Text numberOfLines={1} variant="titleMedium">
-                {it}
-              </Text>
-            </APressable>
+            <View style={{ borderRadius: 16, overflow: "hidden" }}>
+              <Pressable
+                style={{
+                  padding: 6,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+                android_ripple={{ color: theme.colors.primary }}
+                onLongPress={async () => {
+                  if (isRecentQuery && typeof item.id === "number") {
+                    await removeSearchSuggestionFromDatabaseAsync(item.id);
+                    bootStrapAsync();
+                  }
+                }}
+                onPress={() => navigation.push("SearchResultsScreen", { query: item.suggestion })}
+              >
+                <Text variant="titleMedium">{item.suggestion}</Text>
+                {isRecentQuery && <MaterialDesignIcons name="history" size={20} />}
+              </Pressable>
+            </View>
           );
-        })}
-      </Animated.ScrollView>
+        }}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
     flex: 1,
+    paddingHorizontal: 16,
   },
-  suggestionBox: {
-    padding: 16,
+  suggestionContainer: {
+    padding: 6,
   },
 });
