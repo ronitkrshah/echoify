@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { ActivityIndicator, Dialog, Text } from "react-native-paper";
+import { ActivityIndicator, Dialog, Portal, Text } from "react-native-paper";
 
 export type TLoadingDialogController = {
   show(message?: string): void;
@@ -41,18 +41,20 @@ function LoadingDialog(props: object, ref: ForwardedRef<TLoadingDialogController
   });
 
   return (
-    <Dialog visible={visibe} dismissable={false} dismissableBackButton={false}>
-      <Dialog.Content
-        style={{
-          flexDirection: "row",
-          gap: 16,
-          alignItems: "center",
-        }}
-      >
-        <ActivityIndicator animating={visibe} size={"large"} />
-        <Text variant="titleMedium">{infoText}</Text>
-      </Dialog.Content>
-    </Dialog>
+    <Portal>
+      <Dialog visible={visibe} dismissable={false} dismissableBackButton={false}>
+        <Dialog.Content
+          style={{
+            flexDirection: "row",
+            gap: 16,
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator animating={visibe} size={"large"} />
+          <Text variant="titleMedium">{infoText}</Text>
+        </Dialog.Content>
+      </Dialog>
+    </Portal>
   );
 }
 

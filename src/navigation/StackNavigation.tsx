@@ -7,12 +7,16 @@ import { useLayoutEffect, useState } from "react";
 import { LocalStorage } from "~/utils";
 import { PersistanceKeys } from "~/constants";
 import { useTheme } from "react-native-paper";
+import { PlaylistDetailsScreen } from "~/features/playlist";
 
 export type TStackNavigationRoutes = {
   InstanceSelectScreen: undefined;
+  BottomTabNavigation: NavigatorScreenParams<TBottomTabRoutes>;
+
+  PlaylistDetailsScreen: { playlistId: number };
+
   SearchScreen: undefined;
   SearchResultsScreen: { query: string };
-  BottomTabNavigation: NavigatorScreenParams<TBottomTabRoutes>;
 };
 
 const Stack = createNativeStackNavigator<TStackNavigationRoutes>();
@@ -43,6 +47,7 @@ export default function StackNavigation() {
       <Stack.Screen name="InstanceSelectScreen" component={InstanceSelectScreen} />
       <Stack.Screen name="SearchScreen" component={SearchScreen} />
       <Stack.Screen name="SearchResultsScreen" component={SearchResultsScreen} />
+      <Stack.Screen name="PlaylistDetailsScreen" component={PlaylistDetailsScreen} />
       <Stack.Screen name="BottomTabNavigation" component={BottomTabsNavigation} />
     </Stack.Navigator>
   );

@@ -13,7 +13,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { SharedPlayerModule } from "~/features/player";
 
 type TProps = CompositeScreenProps<
-  NativeBottomTabScreenProps<TBottomTabRoutes, "TrendingScreen">,
+  NativeBottomTabScreenProps<TBottomTabRoutes, "HomeScreen">,
   NativeStackScreenProps<TStackNavigationRoutes>
 >;
 
@@ -23,7 +23,7 @@ const _trendingSectionIcons = {
   Romantic: "heart-multiple",
 } as const;
 
-export default function TrendingScreen({ navigation }: TProps) {
+export default function HomeScreen({ navigation }: TProps) {
   const [trendingVideos, setTrendingVideos] = useState<
     Record<TTredingVideosEnum, TSearchPlaylist[]>
   >({

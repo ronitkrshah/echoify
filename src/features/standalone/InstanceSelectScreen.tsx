@@ -45,7 +45,7 @@ export default function InstanceSelectScreen({ navigation }: TProps) {
     );
     loadingDialog.dismiss();
     if (data) {
-      navigation.replace("BottomTabNavigation", { screen: "TrendingScreen" });
+      navigation.replace("BottomTabNavigation", { screen: "HomeScreen" });
     }
   }
 

@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm/browser";
-import { SearchEntity } from "./entities";
+import { PlaylistEntity, SearchEntity, SongEntity } from "./entities";
 
 class Database {
   private _dataSource!: DataSource;
@@ -12,7 +12,7 @@ class Database {
     this._dataSource = new DataSource({
       database: "echoify",
       driver: require("expo-sqlite"),
-      entities: [SearchEntity],
+      entities: [SearchEntity, SongEntity, PlaylistEntity],
       synchronize: true,
       type: "expo",
     });

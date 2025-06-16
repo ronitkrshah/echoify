@@ -1,3 +1,5 @@
 import SearchEntity from "./SearchEntity";
+import SongEntity from "./SongEntity";
+import PlaylistEntity from "./PlaylistEntity";
 
-export { SearchEntity };
+export { SearchEntity, SongEntity, PlaylistEntity };

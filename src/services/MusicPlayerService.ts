@@ -3,10 +3,16 @@ import TrackPlayer, {
   Capability,
   Event,
   RatingType,
+  Track,
 } from "react-native-track-player";
 
 class MusicPlayerService {
   private _isTrackPlayerReady = false;
+  private _queue: Track[] = [];
+
+  get queueList() {
+    return this._queue;
+  }
 
   public async initializePlayerEvents() {
     TrackPlayer.addEventListener(Event.RemotePause, () => TrackPlayer.pause());
@@ -46,6 +52,14 @@ class MusicPlayerService {
 
       this._isTrackPlayerReady = true;
     }
+  }
+
+  async isTrackPlayingAsync() {
+    return (await TrackPlayer.getActiveTrack()) !== undefined;
+  }
+
+  async addTrackToQueueAsync(track: Track, index = -1) {
+    this._queue.push(track);
   }
 }
 
