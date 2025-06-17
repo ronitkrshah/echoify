@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useState } from "react";
-import { FlatList, Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Fragment, useEffect } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 import { FAB, Text, useTheme } from "react-native-paper";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { CompositeScreenProps } from "@react-navigation/native";
@@ -7,48 +7,16 @@ import { NativeBottomTabScreenProps } from "@bottom-tabs/react-navigation";
 import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { TStackNavigationRoutes } from "~/navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { PipedApi, TSearchPlaylist } from "~/api";
-import { asyncFuncExecutor } from "~/utils";
-import Animated, { FadeIn } from "react-native-reanimated";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "HomeScreen">,
   NativeStackScreenProps<TStackNavigationRoutes>
 >;
 
-type TTredingVideosEnum = "Trending" | "Romantic";
-const _trendingSectionIcons = {
-  Trending: "compass",
-  Romantic: "heart-multiple",
-} as const;
-
 export default function HomeScreen({ navigation }: TProps) {
-  const [trendingVideos, setTrendingVideos] = useState<
-    Record<TTredingVideosEnum, TSearchPlaylist[]>
-  >({
-    Trending: [],
-    Romantic: [],
-  });
   const theme = useTheme();
 
-  async function bootStrapAsync() {
-    const [trendingResult, romanticResult] = await Promise.all([
-      asyncFuncExecutor(() =>
-        PipedApi.searchWithQueryAsync<TSearchPlaylist[]>("2025 Trending Music India", "playlists")
-      ),
-      asyncFuncExecutor(() =>
-        PipedApi.searchWithQueryAsync<TSearchPlaylist[]>("Romantic Music India", "playlists")
-      ),
-    ]);
-
-    const [trending] = trendingResult;
-    const [romantic] = romanticResult;
-
-    setTrendingVideos({
-      Trending: trending ?? [],
-      Romantic: romantic ?? [],
-    });
-  }
+  async function bootStrapAsync() {}
 
   useEffect(() => {
     bootStrapAsync();
@@ -66,82 +34,6 @@ export default function HomeScreen({ navigation }: TProps) {
           <MaterialDesignIcons name="magnify" size={24} />
           <Text variant="titleMedium">Search Songs...</Text>
         </Pressable>
-        <ScrollView
-          style={{ flexGrow: 1 }}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ gap: 30 }}
-        >
-          {Object.entries(trendingVideos).map(([key, value], entryIndex) => {
-            if (value.length === 0) return null;
-            return (
-              <View key={key} style={{ gap: 16 }}>
-                <Animated.View
-                  entering={FadeIn}
-                  style={{ flexDirection: "row", alignItems: "center", gap: 16 }}
-                >
-                  <MaterialDesignIcons
-                    name={_trendingSectionIcons[key as keyof typeof _trendingSectionIcons]}
-                    size={40}
-                    color={theme.colors.primary}
-                  />
-                  <Text
-                    variant="titleLarge"
-                    style={{ color: theme.colors.primary, fontWeight: "bold" }}
-                  >
-                    {key}
-                  </Text>
-                </Animated.View>
-
-                <FlatList
-                  horizontal
-                  data={value}
-                  keyExtractor={(item) => item.url}
-                  contentContainerStyle={{ gap: 16 }}
-                  renderItem={({ item, index }) => {
-                    return (
-                      <Animated.View
-                        style={{ borderRadius: 16, overflow: "hidden" }}
-                        entering={FadeIn.delay(index * 150 * entryIndex)}
-                      >
-                        <Pressable
-                          android_ripple={{ color: theme.colors.primary }}
-                          style={{
-                            width: 140,
-                            gap: 12,
-                            paddingHorizontal: 8,
-                            paddingVertical: 16,
-                          }}
-                        >
-                          <View
-                            style={{
-                              width: 120,
-                              aspectRatio: 1,
-                              overflow: "hidden",
-                              borderRadius: 20,
-                              marginHorizontal: "auto",
-                            }}
-                          >
-                            <Image
-                              source={{ uri: item.thumbnail }}
-                              style={StyleSheet.absoluteFillObject}
-                            />
-                          </View>
-                          <Text
-                            numberOfLines={2}
-                            variant="labelLarge"
-                            style={{ textAlign: "center", height: "auto" }}
-                          >
-                            {item.name}
-                          </Text>
-                        </Pressable>
-                      </Animated.View>
-                    );
-                  }}
-                />
-              </View>
-            );
-          })}
-        </ScrollView>
       </View>
       <FAB
         icon={"disc-player"}

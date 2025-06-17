@@ -5,15 +5,20 @@ import { useEffect, useState } from "react";
 import { Dimensions, Image, StyleSheet, ToastAndroid, View } from "react-native";
 import { IconButton, Surface, Text, useTheme } from "react-native-paper";
 import { useSharedValue, withTiming } from "react-native-reanimated";
-import TrackPlayer, { Event, State, Track, useProgress } from "react-native-track-player";
+import TrackPlayer, {
+  Event,
+  PlaybackState,
+  State,
+  Track,
+  useProgress,
+} from "react-native-track-player";
 import { TStackNavigationRoutes } from "~/navigation";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "PlayerControllerScreen">;
 
 export default function PlayerControllerScreen({ route }: TProps) {
   const [activeTrack, setActiveTrack] = useState<Track>();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const seekBarSharedValue = useSharedValue(0);
+  const [playbackState, setPlabackState] = useState<State>();
   const { duration, position } = useProgress(1000);
 
   const theme = useTheme();
@@ -25,30 +30,21 @@ export default function PlayerControllerScreen({ route }: TProps) {
       }
     });
 
-    const playPauseSubscription = TrackPlayer.addEventListener(
+    const playbackStateSubscription = TrackPlayer.addEventListener(
       Event.PlaybackState,
       (playbackState) => {
-        console.log(playbackState);
-
-        switch (playbackState.state) {
-          case State.Playing:
-            setIsPlaying(true);
-            break;
-          case State.Paused:
-            setIsPlaying(false);
-            break;
-          case State.Stopped:
-            setIsPlaying(false);
-            break;
-        }
+        setPlabackState(playbackState.state);
       }
     );
 
     const trackChangeSubscription = TrackPlayer.addEventListener(
       Event.PlaybackActiveTrackChanged,
       (track) => {
-        console.log(track);
-        console.log(track.lastTrack);
+        if (track.track) {
+          setActiveTrack(track.track);
+        } else if (track.lastTrack) {
+          setActiveTrack(track.lastTrack);
+        }
       }
     );
 
@@ -60,7 +56,7 @@ export default function PlayerControllerScreen({ route }: TProps) {
     );
 
     return () => {
-      playPauseSubscription.remove();
+      playbackStateSubscription.remove();
       trackChangeSubscription.remove();
       trackPlayErrorSubscription.remove();
     };
@@ -88,7 +84,6 @@ export default function PlayerControllerScreen({ route }: TProps) {
             overflow: "hidden",
             alignItems: "center",
             justifyContent: "center",
-            // backgroundColor: theme.colors.primary,
           }}
         >
           {activeTrack ? (
@@ -114,9 +109,11 @@ export default function PlayerControllerScreen({ route }: TProps) {
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Text>{moment.utc(position * 1000).format("mm:ss")}</Text>
           <Slider
-            // onValueChange={(value) => withTiming(value, { duration: 300 })}
+            onSlidingComplete={(val) => {
+              TrackPlayer.seekTo(val);
+            }}
             minimumValue={0}
-            maximumValue={activeTrack?.duration}
+            maximumValue={duration}
             value={position}
             style={{ width: Dimensions.get("window").width * 0.6, height: 60 }}
           />
@@ -129,15 +126,17 @@ export default function PlayerControllerScreen({ route }: TProps) {
           <IconButton icon={"repeat"} />
           <IconButton icon={"skip-previous"} />
           <IconButton
+            disabled={playbackState === State.Buffering}
+            loading={playbackState === State.Buffering}
             onPress={async () => {
-              if (isPlaying) {
+              if (playbackState) {
                 TrackPlayer.pause();
               } else {
                 TrackPlayer.play();
               }
             }}
             animated
-            icon={isPlaying ? "pause" : "play"}
+            icon={playbackState === State.Playing ? "pause" : "play"}
           />
           <IconButton icon={"skip-next"} />
           <IconButton icon={"stop"} />

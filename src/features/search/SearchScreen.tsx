@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { Searchbar, Text, useTheme } from "react-native-paper";
 import { ILike } from "typeorm/browser";
-import { PipedApi } from "~/api";
 import { Database } from "~/database";
 import { SearchEntity } from "~/database/entities";
 import { useDebounce } from "~/hooks";
@@ -11,6 +10,7 @@ import MaterialDesignIcons from "@react-native-vector-icons/material-design-icon
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { TStackNavigationRoutes } from "~/navigation";
+import { InnertubeApi } from "~/api";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchScreen">;
 
@@ -39,7 +39,9 @@ export default function SearchScreen({ navigation }: TProps) {
   }
 
   async function getSuggestionsFromApiAsync(query: string) {
-    const [suggestions] = await asyncFuncExecutor(() => PipedApi.getSearchSuggestionsAsync(query));
+    const [suggestions] = await asyncFuncExecutor(() =>
+      InnertubeApi.getSearchSuggestionsAsync(query)
+    );
     if (suggestions) {
       return suggestions.map((it) => ({ id: it, suggestion: it }));
     }
@@ -86,6 +88,8 @@ export default function SearchScreen({ navigation }: TProps) {
         value={query}
         onChangeText={setQuery}
         placeholder="Seach Songs"
+        autoFocus
+        autoCorrect={false}
         onSubmitEditing={() => {
           navigation.push("SearchResultsScreen", { query });
           addSearchSuggestionToDatabaseAsync(query);

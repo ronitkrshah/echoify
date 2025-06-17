@@ -1,98 +1,58 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import {
-  FlatList,
-  Image,
-  ImageBackground,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  ToastAndroid,
-  View,
-} from "react-native";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 import { ActivityIndicator, Text, useTheme } from "react-native-paper";
-import TrackPlayer, { Track } from "react-native-track-player";
-import { PipedApi, TSearchVideo, TVideoStreamResult } from "~/api";
 import { TStackNavigationRoutes } from "~/navigation";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
-import { MusicPlayerService } from "~/services";
 import { useLoadingDialog } from "~/core/components";
-import { asyncFuncExecutor, sleepThreadAsync } from "~/utils";
+import { Music } from "~/models";
+import { InnertubeApi } from "~/api";
+import { asyncFuncExecutor } from "~/utils";
+import TrackPlayer from "react-native-track-player";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchResultsScreen">;
 
 export default function SearchResultsScreen({ route, navigation }: TProps) {
-  const [searchResult, setSearchResult] = useState<TSearchVideo[]>([]);
+  const [searchResult, setSearchResult] = useState<Music[]>([]);
 
   const loadingDialog = useLoadingDialog();
   const theme = useTheme();
 
   useEffect(() => {
-    PipedApi.searchWithQueryAsync<TSearchVideo[]>(route.params.query, "music_videos")
-      .then(setSearchResult)
-      .catch(console.log);
+    InnertubeApi.searchMusicsAsync(route.params.query).then(setSearchResult);
   }, []);
 
-  function formatDuration(seconds: number) {
-    const duration = moment.duration(seconds, "seconds");
-    const minutes = Math.floor(duration.asMinutes());
-    const secs = duration.seconds();
-    return `${minutes}:${secs.toString().padStart(2, "0")}`;
-  }
+  async function handleSongClickAsync(song: Music) {
+    loadingDialog.show("Fetching Stream URL...");
+    const [url] = await asyncFuncExecutor(() => InnertubeApi.getStreamingInfoAsync(song.videoId));
 
-  async function handleSongClickAsync(song: TSearchVideo) {
-    loadingDialog.show("Fetching Streams...");
-    const [streamingInfo] = await asyncFuncExecutor(() =>
-      PipedApi.getVideoStreamingInfoAsync(song.url)
-    );
-
-    if (!streamingInfo) {
+    if (!url) {
       loadingDialog.dismiss();
-      ToastAndroid.show("Something Went Wrong", ToastAndroid.SHORT);
       return;
     }
 
-    /** If threre's no audio streams. Then might be an error */
-    if (!Object.hasOwn(streamingInfo, "audioStreams")) {
-      loadingDialog.dismiss();
-      ToastAndroid.show(
-        (streamingInfo as any as Error).message || JSON.stringify(streamingInfo),
-        ToastAndroid.SHORT
-      );
-      return;
-    }
-
-    await TrackPlayer.reset();
-    let itag = 0;
-    let audioTrackStream: TVideoStreamResult["audioStreams"][number] | undefined;
-    const m4aStreams = streamingInfo.audioStreams.filter((it) => it.format === "M4A");
-    m4aStreams.forEach((it) => {
-      if (it.itag > itag) {
-        itag = it.itag;
-        audioTrackStream = it;
-      }
-    });
-    if (audioTrackStream) {
-      await TrackPlayer.add([
-        {
-          url: audioTrackStream?.url, // Load media from the network
-          title: streamingInfo.title,
-          artist: streamingInfo.uploader,
-          genre: streamingInfo.category,
-          artwork: streamingInfo.thumbnailUrl, // Load artwork from the network
-          duration: streamingInfo.duration,
-        },
-      ]);
-
-      await TrackPlayer.play();
+    try {
+      await TrackPlayer.reset();
       navigation.push("PlayerControllerScreen");
-    } else {
-      ToastAndroid.show("No M4A Streams Found", ToastAndroid.SHORT);
+      TrackPlayer.add([
+        {
+          url,
+          title: song.title,
+          artist: song.author,
+          artwork: song.thumbnail,
+          duration: song.duration,
+        },
+      ]).then(() => {
+        loadingDialog.dismiss();
+        TrackPlayer.play();
+      });
+    } catch (error) {
+      // Ignore
+    } finally {
+      loadingDialog.dismiss();
     }
-
-    loadingDialog.dismiss();
   }
 
   return (
@@ -109,7 +69,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
 
       <Animated.FlatList
         data={searchResult.splice(4, searchResult.length - 1)}
-        keyExtractor={(item) => item.url}
+        keyExtractor={(item) => item.videoId}
         ListHeaderComponent={() => {
           if (searchResult.length === 0) return null;
           return (
@@ -141,7 +101,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
                   return (
                     <Animated.View
                       entering={FadeIn.delay(300 + index * 100)}
-                      key={it.url}
+                      key={it.videoId}
                       style={{ borderRadius: 32, overflow: "hidden", width: "50%" }}
                     >
                       <Pressable
@@ -162,15 +122,9 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
                           resizeMode="cover"
                           style={{ borderRadius: 45 }}
                         />
-                        <View style={{ width: "100%" }}>
-                          <Text
-                            variant="titleSmall"
-                            numberOfLines={1}
-                            style={{ textAlign: "center" }}
-                          >
-                            {it.title}
-                          </Text>
-                        </View>
+                        <Text variant="titleSmall" numberOfLines={1}>
+                          {it.title}
+                        </Text>
                       </Pressable>
                     </Animated.View>
                   );
@@ -229,11 +183,11 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
                       style={{ fontStyle: "italic", color: theme.colors.secondary }}
                       variant="labelLarge"
                     >
-                      {item.uploaderName}
+                      {item.author}
                     </Text>
                   </View>
                   <Text variant="labelLarge" style={{ color: theme.colors.primary }}>
-                    {formatDuration(item.duration)}
+                    {moment.utc(item.duration * 1000).format("mm:ss")}
                   </Text>
                 </View>
               </Pressable>

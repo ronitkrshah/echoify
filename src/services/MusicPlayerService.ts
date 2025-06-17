@@ -24,7 +24,7 @@ class MusicPlayerService {
           ratingType: RatingType.Heart,
           android: {
             alwaysPauseOnInterruption: true,
-            appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+            appKilledPlaybackBehavior: AppKilledPlaybackBehavior.ContinuePlayback,
           },
           capabilities: [
             Capability.Play,
@@ -32,6 +32,7 @@ class MusicPlayerService {
             Capability.Stop,
             Capability.SkipToNext,
             Capability.SkipToPrevious,
+            Capability.SeekTo,
           ],
           notificationCapabilities: [
             Capability.Play,
@@ -39,6 +40,7 @@ class MusicPlayerService {
             Capability.Stop,
             Capability.SkipToNext,
             Capability.SkipToPrevious,
+            Capability.SeekTo,
           ],
         });
       } catch (error) {
