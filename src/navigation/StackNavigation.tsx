@@ -8,12 +8,15 @@ import { LocalStorage } from "~/utils";
 import { PersistanceKeys } from "~/constants";
 import { useTheme } from "react-native-paper";
 import { PlaylistDetailsScreen } from "~/features/playlist";
+import { PlayerControllerScreen } from "~/features/player";
 
 export type TStackNavigationRoutes = {
   InstanceSelectScreen: undefined;
   BottomTabNavigation: NavigatorScreenParams<TBottomTabRoutes>;
 
   PlaylistDetailsScreen: { playlistId: number };
+
+  PlayerControllerScreen: undefined;
 
   SearchScreen: undefined;
   SearchResultsScreen: { query: string };
@@ -48,6 +51,7 @@ export default function StackNavigation() {
       <Stack.Screen name="SearchScreen" component={SearchScreen} />
       <Stack.Screen name="SearchResultsScreen" component={SearchResultsScreen} />
       <Stack.Screen name="PlaylistDetailsScreen" component={PlaylistDetailsScreen} />
+      <Stack.Screen name="PlayerControllerScreen" component={PlayerControllerScreen} />
       <Stack.Screen name="BottomTabNavigation" component={BottomTabsNavigation} />
     </Stack.Navigator>
   );

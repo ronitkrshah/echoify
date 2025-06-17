@@ -1,4 +1,5 @@
 import { TSearchPlaylist } from "./types/playlist";
+import { TVideoStreamResult } from "./types/stream";
 import { TSearchVideo } from "./types/video";
 
 type TSearchFilters = "all" | "music_videos" | "playlists" | "music_songs";
@@ -22,13 +23,14 @@ class PipedApi {
     return (await response.json()).items;
   }
 
-  public async getVideoStreamingInfoAsync(videoUrl: string) {
+  public async getVideoStreamingInfoAsync(videoUrl: string): Promise<TVideoStreamResult> {
     const videoId = videoUrl.split("=").pop();
 
-    if (videoId) {
-      const response = await fetch(`${this._url}/streams/${videoId}`);
-      return await response.json();
+    if (!videoId) {
+      throw new Error("Invalid URL");
     }
+    const response = await fetch(`${this._url}/streams/${videoId}`);
+    return await response.json();
   }
 
   public async getSearchSuggestionsAsync(query: string): Promise<string[]> {

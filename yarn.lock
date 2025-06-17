@@ -1272,6 +1272,11 @@
     prompts "^2.4.2"
     semver "^7.5.2"
 
+"@react-native-community/slider@^4.5.7":
+  version "4.5.7"
+  resolved "https://registry.yarnpkg.com/@react-native-community/slider/-/slider-4.5.7.tgz#523178779f302aa162b0d57211842f81522e8ece"
+  integrity sha512-WMDDZjNF2Bd8M8TrSqKf5xhM9ikdfCHtSPur64Ow3bB/OVrKufUQZ59NmYdNZNeGPvcHHTsafuYTY8zfZfbchQ==
+
 "@react-native-vector-icons/common@^12.0.0":
   version "12.0.0"
   resolved "https://registry.yarnpkg.com/@react-native-vector-icons/common/-/common-12.0.0.tgz#3e5c6678b3c67ae856929c01345103c70f1c420c"

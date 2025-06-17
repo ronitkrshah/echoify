@@ -1,18 +1,32 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { FlatList, Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  ImageBackground,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  ToastAndroid,
+  View,
+} from "react-native";
 import { ActivityIndicator, Text, useTheme } from "react-native-paper";
-import TrackPlayer from "react-native-track-player";
-import { PipedApi, TSearchVideo } from "~/api";
+import TrackPlayer, { Track } from "react-native-track-player";
+import { PipedApi, TSearchVideo, TVideoStreamResult } from "~/api";
 import { TStackNavigationRoutes } from "~/navigation";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import { MusicPlayerService } from "~/services";
+import { useLoadingDialog } from "~/core/components";
+import { asyncFuncExecutor, sleepThreadAsync } from "~/utils";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchResultsScreen">;
 
 export default function SearchResultsScreen({ route, navigation }: TProps) {
   const [searchResult, setSearchResult] = useState<TSearchVideo[]>([]);
+
+  const loadingDialog = useLoadingDialog();
   const theme = useTheme();
 
   useEffect(() => {
@@ -28,7 +42,58 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
     return `${minutes}:${secs.toString().padStart(2, "0")}`;
   }
 
-  async function handleSongClickAsync(url: string) {}
+  async function handleSongClickAsync(song: TSearchVideo) {
+    loadingDialog.show("Fetching Streams...");
+    const [streamingInfo] = await asyncFuncExecutor(() =>
+      PipedApi.getVideoStreamingInfoAsync(song.url)
+    );
+
+    if (!streamingInfo) {
+      loadingDialog.dismiss();
+      ToastAndroid.show("Something Went Wrong", ToastAndroid.SHORT);
+      return;
+    }
+
+    /** If threre's no audio streams. Then might be an error */
+    if (!Object.hasOwn(streamingInfo, "audioStreams")) {
+      loadingDialog.dismiss();
+      ToastAndroid.show(
+        (streamingInfo as any as Error).message || JSON.stringify(streamingInfo),
+        ToastAndroid.SHORT
+      );
+      return;
+    }
+
+    await TrackPlayer.reset();
+    let itag = 0;
+    let audioTrackStream: TVideoStreamResult["audioStreams"][number] | undefined;
+    const m4aStreams = streamingInfo.audioStreams.filter((it) => it.format === "M4A");
+    m4aStreams.forEach((it) => {
+      if (it.itag > itag) {
+        itag = it.itag;
+        audioTrackStream = it;
+      }
+    });
+    if (audioTrackStream) {
+      await TrackPlayer.add([
+        {
+          url: audioTrackStream?.url, // Load media from the network
+          title: streamingInfo.title,
+          artist: streamingInfo.uploader,
+          genre: streamingInfo.category,
+          artwork: streamingInfo.thumbnailUrl, // Load artwork from the network
+          duration: streamingInfo.duration,
+        },
+      ]);
+
+      await TrackPlayer.play();
+      navigation.push("PlayerControllerScreen");
+    } else {
+      ToastAndroid.show("No M4A Streams Found", ToastAndroid.SHORT);
+    }
+
+    loadingDialog.dismiss();
+  }
 
   return (
     <View style={{ paddingHorizontal: 16, gap: 16, flex: 1 }}>
@@ -80,6 +145,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
                       style={{ borderRadius: 32, overflow: "hidden", width: "50%" }}
                     >
                       <Pressable
+                        onPress={() => handleSongClickAsync(it)}
                         style={{
                           alignItems: "center",
                           justifyContent: "center",
@@ -136,6 +202,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
               entering={FadeInDown.delay(index * 100)}
             >
               <Pressable
+                onPress={() => handleSongClickAsync(item)}
                 android_ripple={{ color: theme.colors.primary }}
                 style={{
                   flexDirection: "row",

@@ -4,10 +4,10 @@ import { useTheme } from "react-native-paper";
 import { HistoryScreen } from "~/features/history";
 import { HomeScreen } from "~/features/home";
 import { PlaylistScreen } from "~/features/playlist";
+import { SettingsScreen } from "~/features/settings";
 
 export type TBottomTabRoutes = {
   HomeScreen: undefined;
-  PlayerControllerScreen: undefined;
   HistoryScreen: undefined;
   PlaylistsScreen: undefined;
   SettingsScreen: undefined;
@@ -15,7 +15,6 @@ export type TBottomTabRoutes = {
 
 const TrendingIcon = MaterialDesignIcons.getImageSourceSync("compass-outline", 24)!;
 const HistoryIcon = MaterialDesignIcons.getImageSourceSync("history", 24)!;
-const PlayerIcon = MaterialDesignIcons.getImageSourceSync("disc", 24)!;
 const PlaylistsIcon = MaterialDesignIcons.getImageSourceSync("playlist-music", 24)!;
 const SettingsIcon = MaterialDesignIcons.getImageSourceSync("cog", 24)!;
 
@@ -41,18 +40,13 @@ export default function BottomTabsNavigation() {
         options={{ tabBarLabel: "History", tabBarIcon: () => HistoryIcon }}
       />
       <Tabs.Screen
-        name="PlayerControllerScreen"
-        component={HomeScreen}
-        options={{ tabBarLabel: "Player", tabBarIcon: () => PlayerIcon }}
-      />
-      <Tabs.Screen
         name="PlaylistsScreen"
         component={PlaylistScreen}
         options={{ tabBarLabel: "Playlists", tabBarIcon: () => PlaylistsIcon }}
       />
       <Tabs.Screen
         name="SettingsScreen"
-        component={HomeScreen}
+        component={SettingsScreen}
         options={{ tabBarLabel: "Settings", tabBarIcon: () => SettingsIcon }}
       />
     </Tabs.Navigator>

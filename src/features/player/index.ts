@@ -1,7 +1,3 @@
-import PlayerScreen from "./PlayerScreen";
-import { PlayerActiveOverlay } from "./components";
+import PlayerControllerScreen from "./PlayerControllerScreen";
 
-export const SharedPlayerModule = {
-  PlayerActiveOverlay,
-};
-export { PlayerScreen };
+export { PlayerControllerScreen };

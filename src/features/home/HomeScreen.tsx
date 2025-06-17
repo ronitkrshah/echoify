@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import { FlatList, Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
-import { Text, useTheme } from "react-native-paper";
+import { FAB, Text, useTheme } from "react-native-paper";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { CompositeScreenProps } from "@react-navigation/native";
 import { NativeBottomTabScreenProps } from "@bottom-tabs/react-navigation";
@@ -10,7 +10,6 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { PipedApi, TSearchPlaylist } from "~/api";
 import { asyncFuncExecutor } from "~/utils";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { SharedPlayerModule } from "~/features/player";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "HomeScreen">,
@@ -144,7 +143,13 @@ export default function HomeScreen({ navigation }: TProps) {
           })}
         </ScrollView>
       </View>
-      <SharedPlayerModule.PlayerActiveOverlay />
+      <FAB
+        icon={"disc-player"}
+        style={styles.fab}
+        onPress={() => {
+          navigation.push("PlayerControllerScreen");
+        }}
+      />
     </Fragment>
   );
 }
@@ -166,5 +171,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 16,
     gap: 16,
+  },
+  fab: {
+    position: "absolute",
+    bottom: 16,
+    right: 16,
   },
 });

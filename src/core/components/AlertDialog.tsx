@@ -56,17 +56,15 @@ const AlertDialog = forwardRef<TAlertDialogController>((_, ref) => {
   };
 
   return (
-    <Portal>
-      <Dialog visible={open} onDismiss={() => setOpen(false)}>
-        <Dialog.Title>{title}</Dialog.Title>
-        <Dialog.Content>
-          <Text>{description}</Text>
-        </Dialog.Content>
-        <Dialog.Actions>
-          <Button onPress={handleConfirm}>{confirmText}</Button>
-        </Dialog.Actions>
-      </Dialog>
-    </Portal>
+    <Dialog visible={open} onDismiss={() => setOpen(false)}>
+      <Dialog.Title>{title}</Dialog.Title>
+      <Dialog.Content>
+        <Text>{description}</Text>
+      </Dialog.Content>
+      <Dialog.Actions>
+        <Button onPress={handleConfirm}>{confirmText}</Button>
+      </Dialog.Actions>
+    </Dialog>
   );
 });
 

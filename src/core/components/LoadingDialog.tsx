@@ -41,20 +41,23 @@ function LoadingDialog(props: object, ref: ForwardedRef<TLoadingDialogController
   });
 
   return (
-    <Portal>
-      <Dialog visible={visibe} dismissable={false} dismissableBackButton={false}>
-        <Dialog.Content
-          style={{
-            flexDirection: "row",
-            gap: 16,
-            alignItems: "center",
-          }}
-        >
-          <ActivityIndicator animating={visibe} size={"large"} />
-          <Text variant="titleMedium">{infoText}</Text>
-        </Dialog.Content>
-      </Dialog>
-    </Portal>
+    <Dialog
+      visible={visibe}
+      dismissable={false}
+      dismissableBackButton={false}
+      style={{ zIndex: 100 }}
+    >
+      <Dialog.Content
+        style={{
+          flexDirection: "row",
+          gap: 16,
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator animating={visibe} size={"large"} />
+        <Text variant="titleMedium">{infoText}</Text>
+      </Dialog.Content>
+    </Dialog>
   );
 }
 
