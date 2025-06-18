@@ -10,7 +10,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InnertubeApi } from "~/api";
 import { asyncFuncExecutor } from "~/utils";
 import { Playlist } from "~/models";
-import Animated from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "HomeScreen">,
@@ -92,10 +92,18 @@ export default function HomeScreen({ navigation }: TProps) {
                   keyExtractor={(item) => item.id}
                   horizontal
                   contentContainerStyle={{ gap: 16 }}
-                  renderItem={({ item: playlist }) => {
+                  renderItem={({ item: playlist, index }) => {
                     return (
-                      <Animated.View style={{ borderRadius: 20, overflow: "hidden" }}>
+                      <Animated.View
+                        style={{ borderRadius: 20, overflow: "hidden" }}
+                        entering={FadeIn.delay(index * 100)}
+                      >
                         <Pressable
+                          onPress={() =>
+                            navigation.push("YoutubePlaylistDetailsScreen", {
+                              playlistId: playlist.id,
+                            })
+                          }
                           android_ripple={{ color: theme.colors.primaryContainer }}
                           style={{
                             justifyContent: "center",

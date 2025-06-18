@@ -1,7 +1,7 @@
 import Innertube from "youtubei.js";
 import innertube from "./lib/youtube";
 import { Music, Playlist } from "~/models";
-import { Video } from "node_modules/youtubei.js/dist/src/parser/nodes";
+import { PlaylistVideo, Video } from "node_modules/youtubei.js/dist/src/parser/nodes";
 import moment from "moment";
 
 class InnertubeApi {
@@ -28,7 +28,7 @@ class InnertubeApi {
             video.title.text ?? "Unknown",
             video.author.name,
             video.author.url,
-            parseInt(moment(video.duration.text, "mm:ss").format("mmss")),
+            video.duration.seconds,
             video.best_thumbnail?.url ?? ""
           )
         );
@@ -85,6 +85,37 @@ class InnertubeApi {
     const yt = await this.getInnertubeAsync();
     const suggestions = await yt.getSearchSuggestions(query);
     return suggestions;
+  }
+
+  public async getPlaylistDetialsAsync(playlistId: string) {
+    const yt = await this.getInnertubeAsync();
+
+    const info = await yt.getPlaylist(playlistId);
+    console.log(info);
+
+    const basicInfo = {
+      title: info.info.title,
+      totalVideos: info.info.total_items,
+      thumnail: info.info.thumbnails[0],
+    };
+
+    const videos: Music[] = [];
+
+    info.videos.forEach((it) => {
+      const video = it.as(PlaylistVideo);
+      videos.push(
+        new Music(
+          video.id,
+          video.title.text ?? "Unknown",
+          video.author.name,
+          video.author.url,
+          video.duration.seconds,
+          video.thumbnails[0].url
+        )
+      );
+    });
+
+    return { ...basicInfo, videos };
   }
 }
 
