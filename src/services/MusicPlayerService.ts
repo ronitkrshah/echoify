@@ -5,9 +5,16 @@ import TrackPlayer, {
   RatingType,
   Track,
 } from "react-native-track-player";
+import { InnertubeApi } from "~/api";
+import { Music } from "~/models";
+import { asyncFuncExecutor } from "~/utils";
 
 class MusicPlayerService {
   private _isTrackPlayerReady = false;
+
+  constructor() {
+    this.setupTrackPlayer();
+  }
 
   public async initializePlayerEvents() {
     TrackPlayer.addEventListener(Event.RemotePause, () => TrackPlayer.pause());
@@ -24,12 +31,17 @@ class MusicPlayerService {
           ratingType: RatingType.Heart,
           android: {
             alwaysPauseOnInterruption: true,
-            appKilledPlaybackBehavior: AppKilledPlaybackBehavior.ContinuePlayback,
+            appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
           },
+          compactCapabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.SkipToNext,
+            Capability.SkipToPrevious,
+          ],
           capabilities: [
             Capability.Play,
             Capability.Pause,
-            Capability.Stop,
             Capability.SkipToNext,
             Capability.SkipToPrevious,
             Capability.SeekTo,
@@ -37,22 +49,35 @@ class MusicPlayerService {
           notificationCapabilities: [
             Capability.Play,
             Capability.Pause,
-            Capability.Stop,
             Capability.SkipToNext,
             Capability.SkipToPrevious,
             Capability.SeekTo,
           ],
         });
-      } catch (error) {
-        console.log(error);
-      }
+      } catch (error) {}
 
       this._isTrackPlayerReady = true;
     }
   }
 
-  async isTrackPlayingAsync() {
-    return (await TrackPlayer.getActiveTrack()) !== undefined;
+  public async addMusicToQueueAsync(music: Music) {
+    const [url, error] = await asyncFuncExecutor(() =>
+      InnertubeApi.getStreamingInfoAsync(music.videoId)
+    );
+    if (!url) {
+      throw new Error(error?.message || "Unable To Fetch Stream");
+    }
+
+    await TrackPlayer.add([
+      {
+        url,
+        title: music.title,
+        artist: music.author,
+        artwork: music.thumbnail,
+        duration: music.duration,
+        id: music.videoId,
+      },
+    ]);
   }
 }
 

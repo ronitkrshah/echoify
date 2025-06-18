@@ -10,57 +10,21 @@ import TrackPlayer, {
   PlaybackState,
   State,
   Track,
+  useActiveTrack,
+  useIsPlaying,
   useProgress,
 } from "react-native-track-player";
 import { TStackNavigationRoutes } from "~/navigation";
+import { MusicPlayerService } from "~/services";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "PlayerControllerScreen">;
 
 export default function PlayerControllerScreen({ route }: TProps) {
-  const [activeTrack, setActiveTrack] = useState<Track>();
-  const [playbackState, setPlabackState] = useState<State>();
   const { duration, position } = useProgress(1000);
+  const { bufferingDuringPlay, playing } = useIsPlaying();
+  const activeTrack = useActiveTrack();
 
   const theme = useTheme();
-
-  useEffect(() => {
-    TrackPlayer.getActiveTrack().then((track) => {
-      if (track) {
-        setActiveTrack(track);
-      }
-    });
-
-    const playbackStateSubscription = TrackPlayer.addEventListener(
-      Event.PlaybackState,
-      (playbackState) => {
-        setPlabackState(playbackState.state);
-      }
-    );
-
-    const trackChangeSubscription = TrackPlayer.addEventListener(
-      Event.PlaybackActiveTrackChanged,
-      (track) => {
-        if (track.track) {
-          setActiveTrack(track.track);
-        } else if (track.lastTrack) {
-          setActiveTrack(track.lastTrack);
-        }
-      }
-    );
-
-    const trackPlayErrorSubscription = TrackPlayer.addEventListener(
-      Event.PlaybackError,
-      (error) => {
-        ToastAndroid.show(error.message, ToastAndroid.LONG);
-      }
-    );
-
-    return () => {
-      playbackStateSubscription.remove();
-      trackChangeSubscription.remove();
-      trackPlayErrorSubscription.remove();
-    };
-  }, []);
 
   return (
     <View style={styles.container}>
@@ -124,22 +88,22 @@ export default function PlayerControllerScreen({ route }: TProps) {
       <Surface style={[styles.surface, { backgroundColor: theme.colors.primaryContainer }]}>
         <View style={{ flexDirection: "row" }}>
           <IconButton icon={"repeat"} />
-          <IconButton icon={"skip-previous"} />
+          <IconButton icon={"skip-previous"} onPress={() => TrackPlayer.skipToPrevious()} />
           <IconButton
-            disabled={playbackState === State.Buffering}
-            loading={playbackState === State.Buffering}
+            disabled={bufferingDuringPlay}
+            loading={bufferingDuringPlay}
             onPress={async () => {
-              if (playbackState) {
+              if (playing) {
                 TrackPlayer.pause();
               } else {
                 TrackPlayer.play();
               }
             }}
             animated
-            icon={playbackState === State.Playing ? "pause" : "play"}
+            icon={playing ? "pause" : "play"}
           />
-          <IconButton icon={"skip-next"} />
-          <IconButton icon={"stop"} />
+          <IconButton icon={"skip-next"} onPress={() => TrackPlayer.skipToNext()} />
+          <IconButton icon={"stop"} onPress={() => TrackPlayer.stop()} />
         </View>
       </Surface>
     </View>

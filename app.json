@@ -4,11 +4,11 @@
     "slug": "Echoify",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/ic_launcher.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/ic_launcher.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,20 +17,34 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/ic_launcher_foreground.png",
+        "backgroundImage": "./assets/ic_launcher_background.png",
+        "monochromeImage": "./assets/ic_launcher_monochrome.png"
       },
+      "splash": {
+        "dark": {
+          "backgroundColor": "#232023"
+        }
+      },
+
       "edgeToEdgeEnabled": true,
       "package": "io.github.ronitkrshah.echoify"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       [
         "react-native-bottom-tabs",
         {
           "theme": "material3-dynamic"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/ic_launcher.png",
+          "dark": {
+            "backgroundColor": "#202320"
+          },
+          "imageWidth": 200
         }
       ],
       "expo-sqlite"

@@ -1,3 +1,5 @@
+import { Track } from "react-native-track-player";
+
 export default class Music {
   public constructor(
     public readonly videoId: string,

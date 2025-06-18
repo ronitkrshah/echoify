@@ -2642,6 +2642,13 @@ expo-modules-core@2.4.0:
   dependencies:
     invariant "^2.2.4"
 
+expo-splash-screen@~0.30.9:
+  version "0.30.9"
+  resolved "https://registry.yarnpkg.com/expo-splash-screen/-/expo-splash-screen-0.30.9.tgz#8f2a86b3b802ea46065fc761ed60e77e81bdb84c"
+  integrity sha512-curHUaZxUTZ2dWvz32ao3xPv5mJr1LBqn5V8xm/IULAehB9RGCn8iKiROMN1PYebSG+56vPMuJmBm9P+ayvJpA==
+  dependencies:
+    "@expo/prebuild-config" "^9.0.6"
+
 expo-sqlite@~15.2.12:
   version "15.2.12"
   resolved "https://registry.yarnpkg.com/expo-sqlite/-/expo-sqlite-15.2.12.tgz#b75afdc259d8fd4afa91205cfd830e6e12c4a184"

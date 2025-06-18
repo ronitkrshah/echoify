@@ -20,6 +20,7 @@
     "base-64": "^1.0.0",
     "event-target-polyfill": "^0.0.4",
     "expo": "~53.0.11",
+    "expo-splash-screen": "~0.30.9",
     "expo-sqlite": "~15.2.12",
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.8",
