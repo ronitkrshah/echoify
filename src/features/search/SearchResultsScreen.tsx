@@ -11,7 +11,7 @@ import { Music } from "~/models";
 import { InnertubeApi } from "~/api";
 import { asyncFuncExecutor } from "~/utils";
 import TrackPlayer from "react-native-track-player";
-import { MusicPlayerService } from "~/services";
+import { MusicPlayerService, VirtualMusicListService } from "~/services";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchResultsScreen">;
 
@@ -25,25 +25,31 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
     InnertubeApi.searchMusicsAsync(route.params.query).then(setSearchResult);
   }, []);
 
-  async function handleSongClickAsync(song: Music) {
+  async function handleSongClickAsync(music: Music) {
     const activeTrack = await TrackPlayer.getActiveTrack();
-    /** Checking with thumbnail url */
     if (activeTrack) {
-      if (activeTrack.id === song.videoId) {
+      if (activeTrack.id === music.videoId) {
+        // This track is already playing
         navigation.push("PlayerControllerScreen");
         return;
       }
     }
 
-    loadingDialog.show("Fetching Stream URL...");
+    loadingDialog.show("Fetching Streams");
     navigation.push("PlayerControllerScreen");
 
     try {
-      await TrackPlayer.reset();
-      await MusicPlayerService.addMusicToQueueAsync(song);
+      await VirtualMusicListService.resetAsync();
+      const newTrack = await VirtualMusicListService.getTrackFromMusicAsync(music);
+      VirtualMusicListService.setQueueType("NORMAL");
+      VirtualMusicListService.addMusicsToQueue([music]);
+      loadingDialog.dismiss();
+      await TrackPlayer.add([newTrack]);
       await TrackPlayer.play();
-    } catch (error) {}
-    loadingDialog.dismiss();
+    } catch (error) {
+    } finally {
+      loadingDialog.dismiss();
+    }
   }
 
   return (

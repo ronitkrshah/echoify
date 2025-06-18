@@ -1,11 +1,24 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import moment from "moment";
 import { Fragment, useEffect, useState } from "react";
-import { Dimensions, FlatList, Image, Pressable, StyleSheet, View } from "react-native";
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  ToastAndroid,
+  View,
+} from "react-native";
 import { Appbar, Text, useTheme } from "react-native-paper";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import TrackPlayer from "react-native-track-player";
 import { InnertubeApi } from "~/api";
+import { useLoadingDialog } from "~/core/components";
+import { Music } from "~/models";
 import { TStackNavigationRoutes } from "~/navigation";
+import { VirtualMusicListService } from "~/services";
+import { asyncFuncExecutor } from "~/utils";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "YoutubePlaylistDetailsScreen">;
 
@@ -13,6 +26,27 @@ export default function YoutubePlaylistDetailsScreen({ navigation, route }: TPro
   const [playlistDetails, setPlaylistDetails] =
     useState<Awaited<ReturnType<typeof InnertubeApi.getPlaylistDetialsAsync>>>();
   const theme = useTheme();
+  const loadingDialog = useLoadingDialog();
+
+  async function handleMusicPressAsync(music: Music) {
+    if (!playlistDetails) {
+      ToastAndroid.show("List Unavailable", ToastAndroid.SHORT);
+      return;
+    }
+    loadingDialog.show("Fetching Streams");
+    await VirtualMusicListService.resetAsync();
+    VirtualMusicListService.setQueueType("PLAYLIST");
+    VirtualMusicListService.addMusicsToQueue(playlistDetails.videos);
+    const [track] = await asyncFuncExecutor(() =>
+      VirtualMusicListService.getTrackFromMusicAsync(music)
+    );
+    navigation.push("PlayerControllerScreen");
+    loadingDialog.dismiss();
+    if (track) {
+      await TrackPlayer.add([track]);
+      TrackPlayer.play();
+    }
+  }
 
   useEffect(() => {
     InnertubeApi.getPlaylistDetialsAsync(route.params.playlistId).then(setPlaylistDetails);
@@ -45,6 +79,7 @@ export default function YoutubePlaylistDetailsScreen({ navigation, route }: TPro
               entering={FadeInDown.delay(index * 100)}
             >
               <Pressable
+                onPress={() => handleMusicPressAsync(item)}
                 android_ripple={{ color: theme.colors.primary }}
                 style={{
                   flexDirection: "row",

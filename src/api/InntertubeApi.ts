@@ -91,7 +91,6 @@ class InnertubeApi {
     const yt = await this.getInnertubeAsync();
 
     const info = await yt.getPlaylist(playlistId);
-    console.log(info);
 
     const basicInfo = {
       title: info.info.title,

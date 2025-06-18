@@ -25,23 +25,6 @@ Database.initializeDatabaseConnection().then(() => {
 });
 
 export default function App() {
-  useEffect(() => {
-    const queueEndedSubscription = TrackPlayer.addEventListener(
-      Event.PlaybackActiveTrackChanged,
-      async (event) => {
-        const activeTrack = event.track;
-        if (activeTrack) {
-          const nextTrack = await InnertubeApi.getNextVideoAsync(activeTrack.id);
-          if (nextTrack) await MusicPlayerService.addMusicToQueueAsync(nextTrack);
-        }
-      }
-    );
-
-    return () => {
-      queueEndedSubscription.remove();
-    };
-  }, []);
-
   return (
     <SafeAreaProvider>
       <StatusBar animated style="auto" />

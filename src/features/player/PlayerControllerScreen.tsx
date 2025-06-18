@@ -104,6 +104,7 @@ export default function PlayerControllerScreen({ route }: TProps) {
           />
           <IconButton icon={"skip-next"} onPress={() => TrackPlayer.skipToNext()} />
           <IconButton icon={"stop"} onPress={() => TrackPlayer.stop()} />
+          <IconButton icon={"playlist-plus"} onPress={() => {}} />
         </View>
       </Surface>
     </View>

@@ -59,26 +59,6 @@ class MusicPlayerService {
       this._isTrackPlayerReady = true;
     }
   }
-
-  public async addMusicToQueueAsync(music: Music) {
-    const [url, error] = await asyncFuncExecutor(() =>
-      InnertubeApi.getStreamingInfoAsync(music.videoId)
-    );
-    if (!url) {
-      throw new Error(error?.message || "Unable To Fetch Stream");
-    }
-
-    await TrackPlayer.add([
-      {
-        url,
-        title: music.title,
-        artist: music.author,
-        artwork: music.thumbnail,
-        duration: music.duration,
-        id: music.videoId,
-      },
-    ]);
-  }
 }
 
 /** Exporting a singleton instance */
