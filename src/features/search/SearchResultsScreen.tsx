@@ -11,7 +11,7 @@ import { Music } from "~/models";
 import { InnertubeApi } from "~/api";
 import { asyncFuncExecutor } from "~/utils";
 import TrackPlayer from "react-native-track-player";
-import { MusicPlayerService, VirtualMusicListService } from "~/services";
+import { MusicPlayerService, VirtualMusicPlayerService } from "~/services";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchResultsScreen">;
 
@@ -39,10 +39,10 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
     navigation.push("PlayerControllerScreen");
 
     try {
-      await VirtualMusicListService.resetAsync();
-      const newTrack = await VirtualMusicListService.getTrackFromMusicAsync(music);
-      VirtualMusicListService.setQueueType("NORMAL");
-      VirtualMusicListService.addMusicsToQueue([music]);
+      await VirtualMusicPlayerService.resetAsync();
+      const newTrack = await VirtualMusicPlayerService.getRNTPTrackFromMusicAsync(music);
+      VirtualMusicPlayerService.setQueueType("NORMAL");
+      VirtualMusicPlayerService.addMusicsToQueue([music]);
       loadingDialog.dismiss();
       await TrackPlayer.add([newTrack]);
       await TrackPlayer.play();

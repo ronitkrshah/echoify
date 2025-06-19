@@ -10,7 +10,7 @@ import { asyncFuncExecutor } from "~/utils";
  *
  * This class will handle upcoming music
  */
-class VirtualMuisicListService {
+class VirtualMuisicPlayerService {
   private _queue: Music[] = [];
 
   private _queueType: "PLAYLIST" | "NORMAL" = "NORMAL";
@@ -45,11 +45,11 @@ class VirtualMuisicListService {
         }
 
         const [nextMusic] = await asyncFuncExecutor(() =>
-          InnertubeApi.getNextVideoAsync(currentTrackId)
+          InnertubeApi.getNextMusicAsync(currentTrackId)
         );
 
         if (nextMusic) {
-          const [nextTrack] = await asyncFuncExecutor(() => this.getTrackFromMusicAsync(nextMusic));
+          const [nextTrack] = await asyncFuncExecutor(() => this.getRNTPTrackFromMusicAsync(nextMusic));
 
           if (nextTrack) {
             this._queue.push(nextMusic);
@@ -70,17 +70,17 @@ class VirtualMuisicListService {
     this._queueType = type;
   }
 
-  private async getNextTrackFromQueueListAsync(musicId: string) {
+  private async getNextTrackFromQueueListAsync(currentTrackId: string) {
     let nextMusic: Music | undefined;
 
     // Expensive Func :)
     this._queue.forEach((it, index) => {
-      if (it.videoId !== musicId) return;
+      if (it.videoId !== currentTrackId) return;
       if (index === this._queue.length - 1) return;
 
       nextMusic = this._queue[index + 1];
     });
-    if (nextMusic) return await this.getTrackFromMusicAsync(nextMusic);
+    if (nextMusic) return await this.getRNTPTrackFromMusicAsync(nextMusic);
   }
 
   /** This method will not update actual track player queue */
@@ -95,7 +95,7 @@ class VirtualMuisicListService {
     await TrackPlayer.reset();
   }
 
-  public async getTrackFromMusicAsync(music: Music) {
+  public async getRNTPTrackFromMusicAsync(music: Music) {
     const [url, error] = await asyncFuncExecutor(() =>
       InnertubeApi.getStreamingInfoAsync(music.videoId)
     );
@@ -107,4 +107,4 @@ class VirtualMuisicListService {
   }
 }
 
-export default new VirtualMuisicListService();
+export default new VirtualMuisicPlayerService();

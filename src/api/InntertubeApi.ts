@@ -63,12 +63,12 @@ class InnertubeApi {
     return data.url;
   }
 
-  public async getNextVideoAsync(videoId: string) {
+  public async getNextMusicAsync(videoId: string, index = 1) {
     const yt = await this.getInnertubeAsync();
     const videoInfo = await yt.getInfo(videoId);
 
     if (videoInfo.watch_next_feed) {
-      const video = videoInfo.watch_next_feed[0] as Video;
+      const video = videoInfo.watch_next_feed[index - 1] as Video;
 
       return new Music(
         video.video_id,

@@ -17,7 +17,7 @@ import { InnertubeApi } from "~/api";
 import { useLoadingDialog } from "~/core/components";
 import { Music } from "~/models";
 import { TStackNavigationRoutes } from "~/navigation";
-import { VirtualMusicListService } from "~/services";
+import { VirtualMusicPlayerService } from "~/services";
 import { asyncFuncExecutor } from "~/utils";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "YoutubePlaylistDetailsScreen">;
@@ -34,11 +34,11 @@ export default function YoutubePlaylistDetailsScreen({ navigation, route }: TPro
       return;
     }
     loadingDialog.show("Fetching Streams");
-    await VirtualMusicListService.resetAsync();
-    VirtualMusicListService.setQueueType("PLAYLIST");
-    VirtualMusicListService.addMusicsToQueue(playlistDetails.videos);
+    await VirtualMusicPlayerService.resetAsync();
+    VirtualMusicPlayerService.setQueueType("PLAYLIST");
+    VirtualMusicPlayerService.addMusicsToQueue(playlistDetails.videos);
     const [track] = await asyncFuncExecutor(() =>
-      VirtualMusicListService.getTrackFromMusicAsync(music)
+      VirtualMusicPlayerService.getRNTPTrackFromMusicAsync(music)
     );
     navigation.push("PlayerControllerScreen");
     loadingDialog.dismiss();

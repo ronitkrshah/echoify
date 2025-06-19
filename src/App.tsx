@@ -7,24 +7,27 @@ import { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { Database } from "./database";
 import { MusicPlayerService } from "./services";
-import TrackPlayer, { Event, State } from "react-native-track-player";
-import { Music } from "./models";
-import { InnertubeApi } from "./api";
 import * as SplashScreen from "expo-splash-screen";
 
 SplashScreen.preventAutoHideAsync();
 
 SplashScreen.setOptions({
-  duration: 500,
+  duration: 300,
   fade: true,
 });
 
-MusicPlayerService.setupTrackPlayer();
-Database.initializeDatabaseConnection().then(() => {
-  SplashScreen.hideAsync();
-});
-
 export default function App() {
+  async function bootStrapAsync() {
+    await MusicPlayerService.setupTrackPlayer();
+    await Database.initializeDatabaseConnection();
+  }
+
+  useEffect(() => {
+    bootStrapAsync().finally(() => {
+      SplashScreen.hideAsync()
+    });
+  }, []);
+
   return (
     <SafeAreaProvider>
       <StatusBar animated style="auto" />

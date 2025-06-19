@@ -1,4 +1,4 @@
 import MusicPlayerService from "./MusicPlayerService";
-import VirtualMusicListService from "./VirtualMusicListService";
+import VirtualMusicPlayerService from "./VirtualMusicPlayerService";
 
-export { MusicPlayerService, VirtualMusicListService };
+export { MusicPlayerService, VirtualMusicPlayerService };
