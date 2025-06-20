@@ -2,12 +2,17 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useRef, useState } from "react";
 import { Button, Dimensions, FlatList, StyleSheet, TextInput, View } from "react-native";
 import { Divider, IconButton, Menu, Text, useTheme } from "react-native-paper";
-import { useAlertDialog } from "~/core/components";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { useAlertDialog, useLoadingDialog } from "~/core/components";
 import { Database } from "~/database";
 import { PlaylistEntity } from "~/database/entities";
 import { TStackNavigationRoutes } from "~/navigation";
 import { LocalPlaylistRepository } from "~/repositories";
-import { sleepThreadAsync } from "~/utils";
+import { asyncFuncExecutor, sleepThreadAsync } from "~/utils";
+import { MusicListItem } from "../__shared__/components";
+import { Music } from "~/models";
+import { VirtualMusicPlayerService } from "~/services";
+import TrackPlayer from "react-native-track-player";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "PlaylistDetailsScreen">;
 
@@ -18,6 +23,7 @@ export default function PlaylistDetailsScreen({ navigation, route }: TProps) {
 
   const titleRef = useRef<TextInput>(null);
 
+  const loadingDialog = useLoadingDialog();
   const alertDialog = useAlertDialog();
   const theme = useTheme();
 
@@ -31,6 +37,27 @@ export default function PlaylistDetailsScreen({ navigation, route }: TProps) {
         navigation.goBack();
       },
     });
+  }
+
+  async function handleMusicPressAsync(music: Music) {
+    if (!playlistInfo) {
+      return;
+    }
+    loadingDialog.show("Fetching Streams");
+    await VirtualMusicPlayerService.resetAsync();
+    VirtualMusicPlayerService.setQueueType("PLAYLIST");
+    VirtualMusicPlayerService.addMusicsToQueue(
+      playlistInfo.songs.map((it) => Music.convertFromSongEntity(it))
+    );
+    const [track] = await asyncFuncExecutor(() =>
+      VirtualMusicPlayerService.getRNTPTrackFromMusicAsync(music)
+    );
+    navigation.push("PlayerControllerScreen");
+    loadingDialog.dismiss();
+    if (track) {
+      await TrackPlayer.add([track]);
+      TrackPlayer.play();
+    }
   }
 
   useEffect(() => {
@@ -100,6 +127,24 @@ export default function PlaylistDetailsScreen({ navigation, route }: TProps) {
           </View>
         </View>
       </View>
+      <FlatList
+        data={playlistInfo?.songs}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={{ gap: 16, paddingVertical: 16 }}
+        renderItem={({ item, index }) => {
+          return (
+            <Animated.View
+              style={{ borderRadius: 32, overflow: "hidden", paddingHorizontal: 8 }}
+              entering={FadeInDown.delay(index * 100)}
+            >
+              <MusicListItem
+                music={Music.convertFromSongEntity(item)}
+                onPress={handleMusicPressAsync}
+              />
+            </Animated.View>
+          );
+        }}
+      />
     </View>
   );
 }

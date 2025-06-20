@@ -1,16 +1,43 @@
 import { Repository } from "typeorm";
 import { Database } from "~/database";
-import { PlaylistEntity } from "~/database/entities";
+import { PlaylistEntity, SongEntity } from "~/database/entities";
+import { Music } from "~/models";
 
 class LocalPlaylistRepository {
-  private readonly _db: Repository<PlaylistEntity>;
+  private readonly _playlistDatabase: Repository<PlaylistEntity>;
+  private readonly _songsDatabase: Repository<SongEntity>;
 
   public constructor() {
-    this._db = Database.datasource.getRepository(PlaylistEntity);
+    this._playlistDatabase = Database.datasource.getRepository(PlaylistEntity);
+    this._songsDatabase = Database.datasource.getRepository(SongEntity);
+  }
+
+  public async addMusicToPlaylistAsync(playlistId: number, music: Music) {
+    try {
+      const playlist = await this.getPlaylistWithIdAsync(playlistId);
+      if (!playlist) {
+        throw new Error("Playlist Not Found");
+      }
+      let storedSong = await this._songsDatabase.findOne({ where: { songId: music.videoId } });
+      if (!storedSong) {
+        storedSong = this._songsDatabase.create({
+          title: music.title,
+          duration: music.duration,
+          songId: music.videoId,
+          thumbnail: music.thumbnail,
+          uploadedBy: music.author,
+        });
+      }
+
+      playlist.songs = [...playlist.songs, storedSong];
+      await this._playlistDatabase.save(playlist);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   public async getAllPlaylistAsync(): Promise<{ id: number; name: string; songCount: number }[]> {
-    const list = await this._db
+    const list = await this._playlistDatabase
       .createQueryBuilder("pl")
       .select(["pl.id AS id", "pl.name AS name"])
       .leftJoin("pl.songs", "songs")
@@ -22,21 +49,21 @@ class LocalPlaylistRepository {
   }
 
   public async getPlaylistWithIdAsync(id: number): Promise<PlaylistEntity | null> {
-    const playlist = await this._db.findOne({ where: { id }, relations: ["songs"] });
+    const playlist = await this._playlistDatabase.findOne({ where: { id }, relations: ["songs"] });
     return playlist;
   }
 
   public async createNewPaylistAsync(name: string): Promise<void> {
-    const playlist = this._db.create({ name });
-    await this._db.save(playlist);
+    const playlist = this._playlistDatabase.create({ name });
+    await this._playlistDatabase.save(playlist);
   }
 
   public async deletePlaylistAsync(id: number) {
-    await this._db.delete(id);
+    await this._playlistDatabase.delete(id);
   }
 
   public async updatePlaylistTitleAsync(playlistId: number, newTitle: string) {
-    await this._db.update(playlistId, { name: newTitle });
+    await this._playlistDatabase.update(playlistId, { name: newTitle });
   }
 }
 

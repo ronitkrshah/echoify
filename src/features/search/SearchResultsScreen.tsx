@@ -188,7 +188,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
         renderItem={({ item, index }) => {
           return (
             <Animated.View
-              style={{ borderRadius: 22, overflow: "hidden" }}
+              style={{ borderRadius: 32, overflow: "hidden" }}
               entering={FadeInDown.delay(index * 100)}
             >
               <MusicListItem

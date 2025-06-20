@@ -11,15 +11,39 @@ import RecentsRepository from "~/repositories/RecentsRepository";
 import { MusicListItem } from "../__shared__/components";
 import { Music } from "~/models";
 import { Text, useTheme } from "react-native-paper";
+import { useLoadingDialog } from "~/core/components";
+import { VirtualMusicPlayerService } from "~/services";
+import { asyncFuncExecutor } from "~/utils";
+import TrackPlayer from "react-native-track-player";
 
 type TProps = CompositeScreenProps<
-  NativeBottomTabScreenProps<TBottomTabRoutes, "HomeScreen">,
+  NativeBottomTabScreenProps<TBottomTabRoutes, "RecentsScreen">,
   NativeStackScreenProps<TStackNavigationRoutes>
 >;
 
 export default function RecentScreen({ navigation }: TProps) {
   const [recentSongs, setRecentSongs] = useState<SongEntity[]>([]);
   const theme = useTheme();
+
+  const loadingDialog = useLoadingDialog();
+
+  async function handleMusicPressAsync(music: Music) {
+    loadingDialog.show("Fetching Streams");
+    await VirtualMusicPlayerService.resetAsync();
+    VirtualMusicPlayerService.setQueueType("PLAYLIST");
+    VirtualMusicPlayerService.addMusicsToQueue(
+      recentSongs.map((it) => Music.convertFromSongEntity(it))
+    );
+    const [track] = await asyncFuncExecutor(() =>
+      VirtualMusicPlayerService.getRNTPTrackFromMusicAsync(music)
+    );
+    navigation.push("PlayerControllerScreen");
+    loadingDialog.dismiss();
+    if (track) {
+      await TrackPlayer.add([track]);
+      TrackPlayer.play();
+    }
+  }
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
@@ -40,14 +64,17 @@ export default function RecentScreen({ navigation }: TProps) {
       </View>
       <FlatList
         data={recentSongs}
-        keyExtractor={(item) => item.songId}
+        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ paddingHorizontal: 8, gap: 16 }}
         renderItem={({ item, index }) => (
           <Animated.View
-            style={{ borderRadius: 22, overflow: "hidden" }}
+            style={{ borderRadius: 32, overflow: "hidden" }}
             entering={FadeInDown.delay(index * 100)}
           >
-            <MusicListItem music={Music.convertFromSongEntity(item)} />
+            <MusicListItem
+              onPress={handleMusicPressAsync}
+              music={Music.convertFromSongEntity(item)}
+            />
           </Animated.View>
         )}
       />

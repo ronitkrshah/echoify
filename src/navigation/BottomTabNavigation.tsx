@@ -44,11 +44,11 @@ export default function BottomTabsNavigation() {
         component={PlaylistScreen}
         options={{ tabBarLabel: "Playlists", tabBarIcon: () => PlaylistsIcon }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="SettingsScreen"
         component={SettingsScreen}
         options={{ tabBarLabel: "Settings", tabBarIcon: () => SettingsIcon }}
-      />
+      /> */}
     </Tabs.Navigator>
   );
 }

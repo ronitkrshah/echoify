@@ -1,3 +1,4 @@
 import NewPlaylistDialog from "./NewPlaylistDialog";
+import AddMusicToPlaylistDialog from "./AddMusicToPlaylistDialog";
 
-export { NewPlaylistDialog };
+export { NewPlaylistDialog, AddMusicToPlaylistDialog };

@@ -23,6 +23,9 @@ export default class Music {
       id: music.videoId,
     };
   }
+  public static convertFromRNTPTrack(track: Track): Music {
+    return new Music(track.id, track.title!, track.artist!, track.duration!, track.artwork!);
+  }
 
   public static convertFromSongEntity(entitiy: SongEntity): Music {
     return new Music(

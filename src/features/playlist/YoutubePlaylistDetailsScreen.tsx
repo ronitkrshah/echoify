@@ -76,7 +76,7 @@ export default function YoutubePlaylistDetailsScreen({ navigation, route }: TPro
         renderItem={({ item, index }) => {
           return (
             <Animated.View
-              style={{ borderRadius: 10, overflow: "hidden", paddingHorizontal: 8 }}
+              style={{ borderRadius: 32, overflow: "hidden", paddingHorizontal: 8 }}
               entering={FadeInDown.delay(index * 100)}
             >
               <MusicListItem music={item} onPress={handleMusicPressAsync} />

@@ -16,10 +16,13 @@ import TrackPlayer, {
 } from "react-native-track-player";
 import { TStackNavigationRoutes } from "~/navigation";
 import { MusicPlayerService } from "~/services";
+import { SharedPlaylistModule } from "../playlist";
+import { Music } from "~/models";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "PlayerControllerScreen">;
 
 export default function PlayerControllerScreen({ route }: TProps) {
+  const [showPlaylistAddDialog, setShowPlaylistAddDialog] = useState(false);
   const { duration, position } = useProgress(1000);
   const { bufferingDuringPlay, playing } = useIsPlaying();
   const activeTrack = useActiveTrack();
@@ -104,9 +107,23 @@ export default function PlayerControllerScreen({ route }: TProps) {
           />
           <IconButton icon={"skip-next"} onPress={() => TrackPlayer.skipToNext()} />
           <IconButton icon={"stop"} onPress={() => TrackPlayer.stop()} />
-          <IconButton icon={"playlist-plus"} onPress={() => {}} />
+          <IconButton
+            icon={"playlist-plus"}
+            onPress={() => {
+              setShowPlaylistAddDialog(true);
+            }}
+          />
         </View>
       </Surface>
+      {activeTrack && (
+        <SharedPlaylistModule.AddMusicToPlaylistDialog
+          visible={showPlaylistAddDialog}
+          onDimiss={() => {
+            setShowPlaylistAddDialog(false);
+          }}
+          music={Music.convertFromRNTPTrack(activeTrack)}
+        />
+      )}
     </View>
   );
 }
