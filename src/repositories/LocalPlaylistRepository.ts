@@ -34,6 +34,10 @@ class LocalPlaylistRepository {
   public async deletePlaylistAsync(id: number) {
     await this._db.delete(id);
   }
+
+  public async updatePlaylistTitleAsync(playlistId: number, newTitle: string) {
+    await this._db.update(playlistId, { name: newTitle });
+  }
 }
 
 export default new LocalPlaylistRepository();
