@@ -3,6 +3,7 @@ import { Keyboard, KeyboardEvent, ToastAndroid } from "react-native";
 import { Button, Dialog, Portal, TextInput } from "react-native-paper";
 import { Database } from "~/database";
 import { PlaylistEntity } from "~/database/entities";
+import { LocalPlaylistRepository } from "~/repositories";
 
 type TProps = {
   visible: boolean;
@@ -27,14 +28,9 @@ export default function NewPlaylistDialog({ visible, onDismiss, onPlaylistCreate
       ToastAndroid.show("Invalid Playlist Name", ToastAndroid.SHORT);
       return;
     }
-
-    const repo = Database.datasource.getRepository(PlaylistEntity);
-    const pl = new PlaylistEntity();
-    pl.name = name;
-
-    await repo.save(pl);
-    setPlaylistName("");
-    onPlaylistCreate?.();
+    setPlaylistName("")
+    await LocalPlaylistRepository.createNewPaylistAsync(name)
+    onPlaylistCreate?.()
   }
 
   useEffect(() => {

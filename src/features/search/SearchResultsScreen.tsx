@@ -1,7 +1,7 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { Image, Pressable, StyleSheet, View } from "react-native";
+import { Image, Pressable, StyleSheet, ToastAndroid, View } from "react-native";
 import { ActivityIndicator, Text, useTheme } from "react-native-paper";
 import { TStackNavigationRoutes } from "~/navigation";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
@@ -12,6 +12,8 @@ import { InnertubeApi } from "~/api";
 import { asyncFuncExecutor } from "~/utils";
 import TrackPlayer from "react-native-track-player";
 import { MusicPlayerService, VirtualMusicPlayerService } from "~/services";
+import { Database } from "~/database";
+import { PlaylistEntity, SongEntity } from "~/database/entities";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchResultsScreen">;
 
@@ -51,6 +53,43 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
       loadingDialog.dismiss();
     }
   }
+
+async function handleSongAddToPlaylist(music: Music) {
+  try {
+    const songRepo = Database.datasource.getRepository(SongEntity);
+    const playListRepo = Database.datasource.getRepository(PlaylistEntity);
+
+    // Step 1: Create and save the new song
+    const newSong = songRepo.create({
+      title: music.title,
+      duration: music.duration,
+      songId: music.videoId,
+      thumbnail: music.thumbnail,
+      uploadedBy: music.author
+    });
+    const addedSong = await songRepo.save(newSong);
+
+    // Step 2: Load the playlist with its current songs
+    const playlist = await playListRepo.findOne({
+      where: { id: 1 }, // or whatever ID you want
+      relations: ["songs"] // important: load related songs
+    });
+
+    if (!playlist) throw new Error("Playlist not found");
+
+    // Step 3: Add the new song if it's not already in the playlist
+    const alreadyExists = playlist.songs.some(song => song.songId === addedSong.songId);
+    if (!alreadyExists) {
+      playlist.songs.push(addedSong);
+      await playListRepo.save(playlist); // this handles the join table
+    }
+
+    ToastAndroid.show("ADDED TO PLAYLIST", ToastAndroid.SHORT);
+  } catch (error) {
+    console.log("Failed to add song to playlist:", error);
+  }
+}
+
 
   return (
     <View style={{ paddingHorizontal: 16, gap: 16, flex: 1 }}>
@@ -154,6 +193,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
             >
               <Pressable
                 onPress={() => handleSongClickAsync(item)}
+                onLongPress={() => handleSongAddToPlaylist(item)}
                 android_ripple={{ color: theme.colors.primary }}
                 style={{
                   flexDirection: "row",

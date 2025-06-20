@@ -4,16 +4,24 @@ import TrackPlayer, {
   Event,
   RatingType,
 } from "react-native-track-player";
+import VirtualMusicPlayerService from "./VirtualMusicPlayerService";
 
 class MusicPlayerService {
+  private _isInitialized = false;
   private _isTrackPlayerReady = false;
 
   public async initializePlayerEvents() {
+    if (this._isInitialized) return;
+    this._isInitialized = true;
     TrackPlayer.addEventListener(Event.RemotePause, () => TrackPlayer.pause());
     TrackPlayer.addEventListener(Event.RemotePlay, () => TrackPlayer.play());
     TrackPlayer.addEventListener(Event.RemotePrevious, () => TrackPlayer.skipToPrevious());
     TrackPlayer.addEventListener(Event.RemoteNext, () => TrackPlayer.skipToNext());
     TrackPlayer.addEventListener(Event.RemoteSeek, (val) => TrackPlayer.seekTo(val.position));
+
+    TrackPlayer.addEventListener(Event.PlaybackActiveTrackChanged, (e) =>
+      VirtualMusicPlayerService.handlePlayBackActiveTrackChangeEventAsync(e)
+    );
   }
 
   public async setupTrackPlayer() {

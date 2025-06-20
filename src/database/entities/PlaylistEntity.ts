@@ -4,6 +4,10 @@ import {
   Entity,
   CreateDateColumn,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
+  ManyToMany,
+  JoinTable,
 } from "typeorm/browser";
 import SongEntity from "./SongEntity";
 
@@ -15,7 +19,8 @@ export default class PlaylistEntity {
   @Column()
   public name!: string;
 
-  @OneToMany(() => SongEntity, (song) => song.playlist, { cascade: true })
+  @ManyToMany(() => SongEntity, (song) => song.playlist, { cascade: true })
+  @JoinTable()
   public songs!: SongEntity[];
 
   @CreateDateColumn()

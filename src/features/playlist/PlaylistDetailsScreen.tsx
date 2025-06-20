@@ -6,6 +6,7 @@ import { useAlertDialog } from "~/core/components";
 import { Database } from "~/database";
 import { PlaylistEntity } from "~/database/entities";
 import { TStackNavigationRoutes } from "~/navigation";
+import { LocalPlaylistRepository } from "~/repositories";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "PlaylistDetailsScreen">;
 
@@ -16,26 +17,20 @@ export default function PlaylistDetailsScreen({ navigation, route }: TProps) {
   const alertDialog = useAlertDialog();
   const theme = useTheme();
 
-  async function getPlaylistDetailsAsync(id: number) {
-    const repo = Database.datasource.getRepository(PlaylistEntity);
-    return await repo.findOne({ where: { id } });
-  }
-
   function deletePlaysist(id: number) {
     alertDialog.show({
       title: "Delete",
       description: `Are you sure to delete playlist ${playlistInfo?.name}?`,
       confirmText: "YES I'M SURE",
       async onConfirm() {
-        const repo = Database.datasource.getRepository(PlaylistEntity);
-        await repo.delete({ id });
+        LocalPlaylistRepository.deletePlaylistAsync(route.params.playlistId)
         navigation.goBack();
       },
     });
   }
 
   useEffect(() => {
-    getPlaylistDetailsAsync(route.params.playlistId).then(setPlaylistInfo);
+    LocalPlaylistRepository.getPlaylistWithIdAsync(route.params.playlistId).then(setPlaylistInfo)
   }, []);
 
   return (

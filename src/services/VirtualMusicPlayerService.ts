@@ -1,4 +1,8 @@
-import TrackPlayer, { Event, Track } from "react-native-track-player";
+import TrackPlayer, {
+  Event,
+  PlaybackActiveTrackChangedEvent,
+  Track,
+} from "react-native-track-player";
 import { InnertubeApi } from "~/api";
 import { Music } from "~/models";
 import { asyncFuncExecutor } from "~/utils";
@@ -12,6 +16,7 @@ import { asyncFuncExecutor } from "~/utils";
  */
 class VirtualMuisicPlayerService {
   private _queue: Music[] = [];
+  private _playedSongs = new Set<string>();
 
   private _queueType: "PLAYLIST" | "NORMAL" = "NORMAL";
 
@@ -19,51 +24,62 @@ class VirtualMuisicPlayerService {
   private _isInitialized = false;
   private _isEventProcessing = false;
 
-  public constructor() {
-    if (this._isInitialized) return;
-    this._isInitialized = true;
-
-    TrackPlayer.addEventListener(Event.PlaybackActiveTrackChanged, async (event) => {
-      if (this._isEventProcessing) return; // Prevent overlapping or looping events
-      this._isEventProcessing = true;
-
-      try {
-        if (!event.track) return;
-        const currentTrackId = event.track.id as string;
-
-        const [nextTrack] = await asyncFuncExecutor(() =>
-          this.getNextTrackFromQueueListAsync(currentTrackId)
-        );
-
-        if (nextTrack) {
-          await TrackPlayer.add(nextTrack);
-          return;
-        }
-
-        if (this._queueType === "PLAYLIST") {
-          return;
-        }
-
-        const [nextMusic] = await asyncFuncExecutor(() =>
-          InnertubeApi.getNextMusicAsync(currentTrackId)
-        );
-
-        if (nextMusic) {
-          const [nextTrack] = await asyncFuncExecutor(() => this.getRNTPTrackFromMusicAsync(nextMusic));
-
-          if (nextTrack) {
-            this._queue.push(nextMusic);
-            await TrackPlayer.add([nextTrack]);
-          }
-        }
-      } finally {
-        this._isEventProcessing = false; // Ensure flag is reset even on error
-      }
-    });
-  }
-
   get queue() {
     return this._queue;
+  }
+
+  /**
+   * This function is only meant for track player bg call
+   */
+  public async handlePlayBackActiveTrackChangeEventAsync(event: PlaybackActiveTrackChangedEvent) {
+    if (this._isEventProcessing) return;
+    if (!event.track) return;
+    this._isEventProcessing = true;
+
+    try {
+      const currentTrackId = event.track.id as string;
+      const nextQueueTrack = await this.getNextTrackFromQueueListAsync(currentTrackId);
+      /**
+       * If we have a track in local queue then add that to trackplayer
+       * no need to call next song api
+       */
+      if (nextQueueTrack) {
+        TrackPlayer.add(nextQueueTrack);
+        return;
+      }
+
+      /**
+       *  If we dont have next track it means it's the last track.
+       * In this case we have to fetch next song and update both local and track player queue
+       * but before that if the queue type is playlist then we don't have to do api calls
+       * just stops the player
+       */
+      if (this._queueType === "PLAYLIST") return;
+
+      let nextMusic: Music | undefined;
+      /** Getting next Song */
+      for (let index = 0; index < 3; index++) {
+        const music = await InnertubeApi.getNextMusicAsync(currentTrackId, index);
+        if (!music) continue;
+        if (this._playedSongs.has(music.videoId)) continue;
+        nextMusic = music;
+        break;
+      }
+
+      if (!nextMusic) return;
+      const nextTrack = await this.getRNTPTrackFromMusicAsync(nextMusic);
+
+      /** Update Both queues */
+      if (nextTrack) {
+        this._queue.push(nextMusic);
+        this._playedSongs.add(nextMusic.videoId);
+        TrackPlayer.add(nextTrack);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this._isEventProcessing = false;
+    }
   }
 
   public setQueueType(type: typeof this._queueType) {
@@ -85,12 +101,18 @@ class VirtualMuisicPlayerService {
 
   /** This method will not update actual track player queue */
   public addMusicsToQueue(musics: Music[]) {
-    this._queue = [...this._queue, ...musics];
+    const songsWithoutDuplicates = musics.filter((it) => {
+      if (this._playedSongs.has(it.videoId)) return false;
+      this._playedSongs.add(it.videoId);
+      return true;
+    });
+    this._queue = [...this._queue, ...songsWithoutDuplicates];
   }
 
   /** This method will also clear queue in TrackPlayer */
   public async resetAsync() {
     this._queueType = "NORMAL";
+    this._playedSongs.clear();
     this._queue = [];
     await TrackPlayer.reset();
   }

@@ -99,7 +99,7 @@ export default function SearchScreen({ navigation }: TProps) {
         layout={LinearTransition}
         data={suggestions}
         keyExtractor={(item) => item.id?.toString()}
-        contentContainerStyle={{ paddingVertical: 16 }}
+        contentContainerStyle={{ paddingVertical: 16, gap: 12 }}
         renderItem={({ item, index }) => {
           /**
            * We storing number and string both for ids. So If it's number then
@@ -125,7 +125,16 @@ export default function SearchScreen({ navigation }: TProps) {
                 }}
                 onPress={() => navigation.push("SearchResultsScreen", { query: item.suggestion })}
               >
-                <Text variant="titleMedium">{item.suggestion}</Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 6,
+                    alignItems: "center",
+                  }}
+                >
+                  <MaterialDesignIcons name="magnify" size={20} />
+                  <Text variant="titleMedium">{item.suggestion}</Text>
+                </View>
                 {isRecentQuery && <MaterialDesignIcons name="history" size={20} />}
               </Pressable>
             </View>

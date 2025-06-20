@@ -48,6 +48,8 @@ export default function HomeScreen({ navigation }: TProps) {
 
   useEffect(() => {
     bootStrapAsync();
+    console.log("ok");
+    
   }, []);
 
   return (

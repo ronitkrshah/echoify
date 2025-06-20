@@ -11,13 +11,14 @@ import { FAB, Text, useTheme } from "react-native-paper";
 import { NewPlaylistDialog } from "./components";
 import { Database } from "~/database";
 import { PlaylistEntity } from "~/database/entities";
-import Animated from "react-native-reanimated";
+import Animated, { FadeIn, FadeInDown, LinearTransition } from "react-native-reanimated";
 import MaterialCommunityIcons from "@react-native-vector-icons/material-design-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { TStackNavigationRoutes } from "~/navigation";
 import { CompositeScreenProps } from "@react-navigation/native";
 import { NativeBottomTabScreenProps } from "@bottom-tabs/react-navigation";
 import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
+import { LocalPlaylistRepository } from "~/repositories";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "PlaylistsScreen">,
@@ -26,18 +27,13 @@ type TProps = CompositeScreenProps<
 
 export default function PlaylistScreen({ navigation }: TProps) {
   const [showPlaylistCreateDialog, setShowPlaylistCreateDialog] = useState(false);
-  const [playlists, setPlaylists] = useState<PlaylistEntity[]>([]);
+  const [playlists, setPlaylists] = useState<Awaited<ReturnType<typeof LocalPlaylistRepository.getAllPlaylistAsync>>>([]);
 
-  const theme = useTheme();
-
-  async function getSavedPlaylistsAsync() {
-    const repo = Database.datasource.getRepository(PlaylistEntity);
-    return await repo.find({ order: { createdAt: "DESC" } });
-  }
+  const theme = useTheme();  
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
-      getSavedPlaylistsAsync().then(setPlaylists);
+      LocalPlaylistRepository.getAllPlaylistAsync().then(setPlaylists)
     });
 
     return unsubscribe;
@@ -47,7 +43,8 @@ export default function PlaylistScreen({ navigation }: TProps) {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <View style={{ flex: 1, paddingHorizontal: 16 }}>
         <View style={{ flex: 1 }}>
-          <FlatList
+          <Animated.FlatList
+          layout={LinearTransition}
             ListEmptyComponent={() => (
               <View
                 style={{
@@ -67,9 +64,10 @@ export default function PlaylistScreen({ navigation }: TProps) {
             columnWrapperStyle={{
               justifyContent: "space-evenly",
             }}
-            renderItem={({ item }) => {
+            renderItem={({ item, index }) => {
               return (
-                <View
+                <Animated.View
+                entering={FadeInDown.delay(index * 100).duration(500)}
                   style={{
                     width: Dimensions.get("screen").width * 0.4,
                     height: 150,
@@ -95,7 +93,7 @@ export default function PlaylistScreen({ navigation }: TProps) {
                       {item.name}
                     </Text>
                   </Pressable>
-                </View>
+                </Animated.View>
               );
             }}
           />
@@ -113,7 +111,7 @@ export default function PlaylistScreen({ navigation }: TProps) {
         onDismiss={() => setShowPlaylistCreateDialog(false)}
         onPlaylistCreate={() => {
           setShowPlaylistCreateDialog(false);
-          getSavedPlaylistsAsync().then(setPlaylists);
+          LocalPlaylistRepository.getAllPlaylistAsync().then(setPlaylists)
         }}
       />
     </KeyboardAvoidingView>

@@ -1,10 +1,13 @@
-import { Column, PrimaryGeneratedColumn, Entity, ManyToOne } from "typeorm/browser";
+import { Column, PrimaryGeneratedColumn, Entity, ManyToOne, ManyToMany } from "typeorm/browser";
 import PlaylistEntity from "./PlaylistEntity";
 
 @Entity("song")
 export default class SongEntity {
   @PrimaryGeneratedColumn()
   public id!: number;
+
+  @Column()
+  public songId!: string;
 
   @Column()
   public title!: string;
@@ -18,6 +21,6 @@ export default class SongEntity {
   @Column("int")
   public duration!: number;
 
-  @ManyToOne(() => PlaylistEntity, (playlist) => playlist.songs)
+  @ManyToMany(() => PlaylistEntity, (playlist) => playlist.songs)
   public playlist!: PlaylistEntity;
 }
