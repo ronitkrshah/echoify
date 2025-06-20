@@ -14,6 +14,7 @@ import TrackPlayer from "react-native-track-player";
 import { MusicPlayerService, VirtualMusicPlayerService } from "~/services";
 import { Database } from "~/database";
 import { PlaylistEntity, SongEntity } from "~/database/entities";
+import { MusicListItem } from "../__shared__/components";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchResultsScreen">;
 
@@ -54,42 +55,41 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
     }
   }
 
-async function handleSongAddToPlaylist(music: Music) {
-  try {
-    const songRepo = Database.datasource.getRepository(SongEntity);
-    const playListRepo = Database.datasource.getRepository(PlaylistEntity);
+  async function handleSongAddToPlaylist(music: Music) {
+    try {
+      const songRepo = Database.datasource.getRepository(SongEntity);
+      const playListRepo = Database.datasource.getRepository(PlaylistEntity);
 
-    // Step 1: Create and save the new song
-    const newSong = songRepo.create({
-      title: music.title,
-      duration: music.duration,
-      songId: music.videoId,
-      thumbnail: music.thumbnail,
-      uploadedBy: music.author
-    });
-    const addedSong = await songRepo.save(newSong);
+      // Step 1: Create and save the new song
+      const newSong = songRepo.create({
+        title: music.title,
+        duration: music.duration,
+        songId: music.videoId,
+        thumbnail: music.thumbnail,
+        uploadedBy: music.author,
+      });
+      const addedSong = await songRepo.save(newSong);
 
-    // Step 2: Load the playlist with its current songs
-    const playlist = await playListRepo.findOne({
-      where: { id: 1 }, // or whatever ID you want
-      relations: ["songs"] // important: load related songs
-    });
+      // Step 2: Load the playlist with its current songs
+      const playlist = await playListRepo.findOne({
+        where: { id: 1 }, // or whatever ID you want
+        relations: ["songs"], // important: load related songs
+      });
 
-    if (!playlist) throw new Error("Playlist not found");
+      if (!playlist) throw new Error("Playlist not found");
 
-    // Step 3: Add the new song if it's not already in the playlist
-    const alreadyExists = playlist.songs.some(song => song.songId === addedSong.songId);
-    if (!alreadyExists) {
-      playlist.songs.push(addedSong);
-      await playListRepo.save(playlist); // this handles the join table
+      // Step 3: Add the new song if it's not already in the playlist
+      const alreadyExists = playlist.songs.some((song) => song.songId === addedSong.songId);
+      if (!alreadyExists) {
+        playlist.songs.push(addedSong);
+        await playListRepo.save(playlist); // this handles the join table
+      }
+
+      ToastAndroid.show("ADDED TO PLAYLIST", ToastAndroid.SHORT);
+    } catch (error) {
+      console.log("Failed to add song to playlist:", error);
     }
-
-    ToastAndroid.show("ADDED TO PLAYLIST", ToastAndroid.SHORT);
-  } catch (error) {
-    console.log("Failed to add song to playlist:", error);
   }
-}
-
 
   return (
     <View style={{ paddingHorizontal: 16, gap: 16, flex: 1 }}>
@@ -191,43 +191,11 @@ async function handleSongAddToPlaylist(music: Music) {
               style={{ borderRadius: 22, overflow: "hidden" }}
               entering={FadeInDown.delay(index * 100)}
             >
-              <Pressable
-                onPress={() => handleSongClickAsync(item)}
-                onLongPress={() => handleSongAddToPlaylist(item)}
-                android_ripple={{ color: theme.colors.primary }}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 22,
-                  padding: 6,
-                }}
-              >
-                <Image
-                  source={{ uri: item.thumbnail }}
-                  height={60}
-                  width={60}
-                  style={{ borderRadius: 30 }}
-                />
-                <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 12 }}>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text numberOfLines={2}>{item.title}</Text>
-                    <Text
-                      style={{ fontStyle: "italic", color: theme.colors.secondary }}
-                      variant="labelLarge"
-                    >
-                      {item.author}
-                    </Text>
-                  </View>
-                  <Text variant="labelLarge" style={{ color: theme.colors.primary }}>
-                    {moment.utc(item.duration * 1000).format("mm:ss")}
-                  </Text>
-                </View>
-              </Pressable>
+              <MusicListItem
+                music={item}
+                onPress={handleSongClickAsync}
+                onLongPress={handleSongAddToPlaylist}
+              />
             </Animated.View>
           );
         }}

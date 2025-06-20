@@ -1,11 +1,11 @@
 import { Track } from "react-native-track-player";
+import { SongEntity } from "~/database/entities";
 
 export default class Music {
   public constructor(
     public readonly videoId: string,
     public readonly title: string,
     public readonly author: string,
-    public readonly authorUrl: string,
     public readonly duration: number,
     public readonly thumbnail: string
   ) {}
@@ -22,5 +22,15 @@ export default class Music {
       duration: music.duration,
       id: music.videoId,
     };
+  }
+
+  public static convertFromSongEntity(entitiy: SongEntity): Music {
+    return new Music(
+      entitiy.songId,
+      entitiy.title,
+      entitiy.uploadedBy,
+      entitiy.duration,
+      entitiy.thumbnail
+    );
   }
 }

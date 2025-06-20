@@ -9,15 +9,16 @@ class LocalPlaylistRepository {
     this._db = Database.datasource.getRepository(PlaylistEntity);
   }
 
-  public async getAllPlaylistAsync(): Promise<{id: number, name: string, songCount: number}[]> {
-    const list = await this._db.createQueryBuilder("pl")
-    .select(["pl.id AS id", "pl.name AS name"])
-    .leftJoin("pl.songs", "songs")
-    .addSelect("COUNT(songs.id)", "songCount")
-    .groupBy("pl.id")
-    .getRawMany()
+  public async getAllPlaylistAsync(): Promise<{ id: number; name: string; songCount: number }[]> {
+    const list = await this._db
+      .createQueryBuilder("pl")
+      .select(["pl.id AS id", "pl.name AS name"])
+      .leftJoin("pl.songs", "songs")
+      .addSelect("COUNT(songs.id)", "songCount")
+      .groupBy("pl.id")
+      .getRawMany();
 
-    return list
+    return list;
   }
 
   public async getPlaylistWithIdAsync(id: number): Promise<PlaylistEntity | null> {
@@ -26,8 +27,8 @@ class LocalPlaylistRepository {
   }
 
   public async createNewPaylistAsync(name: string): Promise<void> {
-    const playlist = this._db.create({name})
-    await this._db.save(playlist)
+    const playlist = this._db.create({ name });
+    await this._db.save(playlist);
   }
 
   public async deletePlaylistAsync(id: number) {
@@ -35,4 +36,4 @@ class LocalPlaylistRepository {
   }
 }
 
-export default new LocalPlaylistRepository()
+export default new LocalPlaylistRepository();

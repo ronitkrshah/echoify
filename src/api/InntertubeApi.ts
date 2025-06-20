@@ -27,7 +27,6 @@ class InnertubeApi {
             video.video_id,
             video.title.text ?? "Unknown",
             video.author.name,
-            video.author.url,
             video.duration.seconds,
             video.best_thumbnail?.url ?? ""
           )
@@ -74,8 +73,7 @@ class InnertubeApi {
         video.video_id,
         video.title.text ?? "Unknown",
         video.author.name,
-        video.author.url,
-        parseInt(moment(video.duration.text, "mm:ss").format("mmss")),
+        video.duration.seconds,
         video.best_thumbnail?.url ?? ""
       );
     }
@@ -107,7 +105,6 @@ class InnertubeApi {
           video.id,
           video.title.text ?? "Unknown",
           video.author.name,
-          video.author.url,
           video.duration.seconds,
           video.thumbnails[0].url
         )

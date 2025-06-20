@@ -19,6 +19,7 @@ import { Music } from "~/models";
 import { TStackNavigationRoutes } from "~/navigation";
 import { VirtualMusicPlayerService } from "~/services";
 import { asyncFuncExecutor } from "~/utils";
+import { MusicListItem } from "../__shared__/components";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "YoutubePlaylistDetailsScreen">;
 
@@ -78,42 +79,7 @@ export default function YoutubePlaylistDetailsScreen({ navigation, route }: TPro
               style={{ borderRadius: 10, overflow: "hidden", paddingHorizontal: 8 }}
               entering={FadeInDown.delay(index * 100)}
             >
-              <Pressable
-                onPress={() => handleMusicPressAsync(item)}
-                android_ripple={{ color: theme.colors.primary }}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 22,
-                  padding: 6,
-                }}
-              >
-                <Image
-                  source={{ uri: item.thumbnail }}
-                  height={60}
-                  width={60}
-                  style={{ borderRadius: 30 }}
-                />
-                <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 12 }}>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text numberOfLines={2}>{item.title}</Text>
-                    <Text
-                      style={{ fontStyle: "italic", color: theme.colors.secondary }}
-                      variant="labelLarge"
-                    >
-                      {item.author}
-                    </Text>
-                  </View>
-                  <Text variant="labelLarge" style={{ color: theme.colors.primary }}>
-                    {moment.utc(item.duration * 1000).format("mm:ss")}
-                  </Text>
-                </View>
-              </Pressable>
+              <MusicListItem music={item} onPress={handleMusicPressAsync} />
             </Animated.View>
           );
         }}

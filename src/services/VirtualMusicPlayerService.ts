@@ -5,6 +5,7 @@ import TrackPlayer, {
 } from "react-native-track-player";
 import { InnertubeApi } from "~/api";
 import { Music } from "~/models";
+import RecentsRepository from "~/repositories/RecentsRepository";
 import { asyncFuncExecutor } from "~/utils";
 
 /**
@@ -35,6 +36,12 @@ class VirtualMuisicPlayerService {
     if (this._isEventProcessing) return;
     if (!event.track) return;
     this._isEventProcessing = true;
+
+    try {
+      RecentsRepository.addSongToRecentsAsync(event.track as Track & { id: string });
+    } catch (error) {
+      console.log("Recent Adding Error:", error);
+    }
 
     try {
       const currentTrackId = event.track.id as string;
