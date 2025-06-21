@@ -2,21 +2,19 @@ import Innertube from "youtubei.js";
 import innertube from "./lib/youtube";
 import { Music, Playlist } from "~/models";
 import { PlaylistVideo, Video } from "node_modules/youtubei.js/dist/src/parser/nodes";
-import moment from "moment";
 
 class InnertubeApi {
-  private _innertube?: Innertube;
+  private _innertube!: Innertube;
 
-  private async getInnertubeAsync(): Promise<Innertube> {
+  public async setupInnertube() {
     if (!this._innertube) {
       this._innertube = await innertube;
     }
-    return this._innertube;
+    this._innertube;
   }
 
   public async searchMusicsAsync(query: string) {
-    const yt = await this.getInnertubeAsync();
-    const data = await yt.search(query, { type: "video" });
+    const data = await this._innertube.search(query, { type: "video" });
     const retVal: Music[] = [];
 
     for (const reslut of data.results) {
@@ -28,8 +26,8 @@ class InnertubeApi {
             video.title.text ?? "Unknown",
             video.author.name,
             video.duration.seconds,
-            video.best_thumbnail?.url ?? ""
-          )
+            video.best_thumbnail?.url ?? "",
+          ),
         );
       } catch (error) {}
     }
@@ -38,8 +36,7 @@ class InnertubeApi {
   }
 
   public async serachPlaylistsAsync(query: string) {
-    const yt = await this.getInnertubeAsync();
-    const data = await yt.search(query, { type: "playlist" });
+    const data = await this._innertube.search(query, { type: "playlist" });
 
     const retval: Playlist[] = [];
     data.results.forEach((it) => {
@@ -48,8 +45,8 @@ class InnertubeApi {
         new Playlist(
           playlist?.content_id,
           playlist?.metadata.title?.text,
-          playlist?.content_image?.primary_thumbnail?.image[0]?.url
-        )
+          playlist?.content_image?.primary_thumbnail?.image[0]?.url,
+        ),
       );
     });
 
@@ -57,14 +54,12 @@ class InnertubeApi {
   }
 
   public async getStreamingInfoAsync(videoId: string) {
-    const yt = await this.getInnertubeAsync();
-    const data = await yt.getStreamingData(videoId, { quality: "best" });
+    const data = await this._innertube.getStreamingData(videoId, { quality: "best" });
     return data.url;
   }
 
   public async getNextMusicAsync(videoId: string, index = 0) {
-    const yt = await this.getInnertubeAsync();
-    const videoInfo = await yt.getInfo(videoId);
+    const videoInfo = await this._innertube.getInfo(videoId);
 
     if (videoInfo.watch_next_feed) {
       const video = videoInfo.watch_next_feed[index] as Video;
@@ -74,21 +69,18 @@ class InnertubeApi {
         video.title.text ?? "Unknown",
         video.author.name,
         video.duration.seconds,
-        video.best_thumbnail?.url ?? ""
+        video.best_thumbnail?.url ?? "",
       );
     }
   }
 
   public async getSearchSuggestionsAsync(query: string) {
-    const yt = await this.getInnertubeAsync();
-    const suggestions = await yt.getSearchSuggestions(query);
+    const suggestions = await this._innertube.getSearchSuggestions(query);
     return suggestions;
   }
 
   public async getPlaylistDetialsAsync(playlistId: string) {
-    const yt = await this.getInnertubeAsync();
-
-    const info = await yt.getPlaylist(playlistId);
+    const info = await this._innertube.getPlaylist(playlistId);
 
     const basicInfo = {
       title: info.info.title,
@@ -106,8 +98,8 @@ class InnertubeApi {
           video.title.text ?? "Unknown",
           video.author.name,
           video.duration.seconds,
-          video.thumbnails[0].url
-        )
+          video.thumbnails[0].url,
+        ),
       );
     });
 

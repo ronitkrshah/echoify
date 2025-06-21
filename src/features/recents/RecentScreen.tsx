@@ -12,8 +12,8 @@ import { MusicListItem } from "../__shared__/components";
 import { Music } from "~/models";
 import { Text, useTheme } from "react-native-paper";
 import { useLoadingDialog } from "~/core/components";
-import { VirtualMusicPlayerService } from "~/services";
-import { asyncFuncExecutor } from "~/utils";
+import { VirtualMusicPlayerService } from "~/core/services";
+import { asyncFuncExecutor } from "~/core/utils";
 import TrackPlayer from "react-native-track-player";
 
 type TProps = CompositeScreenProps<

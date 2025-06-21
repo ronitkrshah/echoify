@@ -6,7 +6,7 @@ import TrackPlayer, {
 import { InnertubeApi } from "~/api";
 import { Music } from "~/models";
 import RecentsRepository from "~/repositories/RecentsRepository";
-import { asyncFuncExecutor } from "~/utils";
+import { asyncFuncExecutor } from "~/core/utils";
 
 /**
  * The virtual list will help to track the current track and

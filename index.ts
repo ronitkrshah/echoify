@@ -2,7 +2,7 @@ import { registerRootComponent } from "expo";
 
 import App from "./src/App";
 import TrackPlayer from "react-native-track-player";
-import { MusicPlayerService } from "~/services";
+import { MusicPlayerService } from "~/core/services";
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);
 // It also ensures that whether you load the app in Expo Go or in a native build,

@@ -17,8 +17,8 @@ import { InnertubeApi } from "~/api";
 import { useLoadingDialog } from "~/core/components";
 import { Music } from "~/models";
 import { TStackNavigationRoutes } from "~/navigation";
-import { VirtualMusicPlayerService } from "~/services";
-import { asyncFuncExecutor } from "~/utils";
+import { VirtualMusicPlayerService } from "~/core/services";
+import { asyncFuncExecutor } from "~/core/utils";
 import { MusicListItem } from "../__shared__/components";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "YoutubePlaylistDetailsScreen">;

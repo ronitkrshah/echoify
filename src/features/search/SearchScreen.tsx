@@ -5,7 +5,7 @@ import { ILike } from "typeorm/browser";
 import { Database } from "~/database";
 import { SearchEntity } from "~/database/entities";
 import { useDebounce } from "~/hooks";
-import { asyncFuncExecutor } from "~/utils";
+import { asyncFuncExecutor } from "~/core/utils";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";

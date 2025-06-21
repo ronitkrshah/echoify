@@ -8,10 +8,10 @@ import { Database } from "~/database";
 import { PlaylistEntity } from "~/database/entities";
 import { TStackNavigationRoutes } from "~/navigation";
 import { LocalPlaylistRepository } from "~/repositories";
-import { asyncFuncExecutor, sleepThreadAsync } from "~/utils";
+import { asyncFuncExecutor, sleepThreadAsync } from "~/core/utils";
 import { MusicListItem } from "../__shared__/components";
 import { Music } from "~/models";
-import { VirtualMusicPlayerService } from "~/services";
+import { VirtualMusicPlayerService } from "~/core/services";
 import TrackPlayer from "react-native-track-player";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "PlaylistDetailsScreen">;

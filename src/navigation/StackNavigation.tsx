@@ -5,9 +5,10 @@ import { SearchResultsScreen, SearchScreen } from "~/features/search";
 import { useTheme } from "react-native-paper";
 import { PlaylistDetailsScreen, YoutubePlaylistDetailsScreen } from "~/features/playlist";
 import { PlayerControllerScreen } from "~/features/player";
+import { SplashScreen } from "~/features/splash";
 
 export type TStackNavigationRoutes = {
-  InstanceSelectScreen: undefined;
+  SplashScreen: undefined;
   BottomTabNavigation: NavigatorScreenParams<TBottomTabRoutes>;
 
   PlaylistDetailsScreen: { playlistId: number };
@@ -31,6 +32,7 @@ export default function StackNavigation() {
         contentStyle: { backgroundColor: theme.colors.background },
       }}
     >
+      <Stack.Screen name="SplashScreen" component={SplashScreen} />
       <Stack.Screen name="BottomTabNavigation" component={BottomTabsNavigation} />
       <Stack.Screen name="SearchScreen" component={SearchScreen} />
       <Stack.Screen name="SearchResultsScreen" component={SearchResultsScreen} />

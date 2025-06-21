@@ -20,7 +20,7 @@ class MusicPlayerService {
     TrackPlayer.addEventListener(Event.RemoteSeek, (val) => TrackPlayer.seekTo(val.position));
 
     TrackPlayer.addEventListener(Event.PlaybackActiveTrackChanged, (e) =>
-      VirtualMusicPlayerService.handlePlayBackActiveTrackChangeEventAsync(e)
+      VirtualMusicPlayerService.handlePlayBackActiveTrackChangeEventAsync(e),
     );
   }
 
@@ -40,6 +40,7 @@ class MusicPlayerService {
           Capability.Pause,
           Capability.SkipToNext,
           Capability.SkipToPrevious,
+          Capability.Stop,
         ],
         capabilities: [
           Capability.Play,
@@ -47,6 +48,7 @@ class MusicPlayerService {
           Capability.SkipToNext,
           Capability.SkipToPrevious,
           Capability.SeekTo,
+          Capability.Stop,
         ],
         notificationCapabilities: [
           Capability.Play,
@@ -54,6 +56,7 @@ class MusicPlayerService {
           Capability.SkipToNext,
           Capability.SkipToPrevious,
           Capability.SeekTo,
+          Capability.Stop,
         ],
       });
     } catch (error) {}
