@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm/browser";
 import { PlaylistEntity, RecentsEntity, SearchEntity, SongEntity } from "./entities";
+import { InitialMigration1750506359778 } from "./migrations/1750506359778-InitialMigration";
 
 class Database {
   private _dataSource!: DataSource;
@@ -14,8 +15,15 @@ class Database {
       driver: require("expo-sqlite"),
       entities: [SearchEntity, SongEntity, PlaylistEntity, RecentsEntity],
       synchronize: __DEV__,
+      migrations: [InitialMigration1750506359778],
+      migrationsRun: true,
       type: "expo",
     });
+  }
+
+  public async runMigrationsAsync() {
+    await this.datasource.runMigrations();
+    await this.datasource.synchronize();
   }
 
   public async initializeDatabaseConnection() {

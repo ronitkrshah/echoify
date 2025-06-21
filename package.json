@@ -17,10 +17,10 @@
     "@react-native-vector-icons/material-design-icons": "^12.0.0",
     "@react-navigation/native": "^7.1.11",
     "@react-navigation/native-stack": "^7.3.16",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "base-64": "^1.0.0",
     "event-target-polyfill": "^0.0.4",
     "expo": "~53.0.11",
-    "expo-notifications": "~0.31.3",
     "expo-splash-screen": "~0.30.9",
     "expo-sqlite": "~15.2.12",
     "expo-status-bar": "~2.2.3",
@@ -51,6 +51,15 @@
     "babel-plugin-transform-typescript-metadata": "^0.3.2",
     "patch-package": "^8.0.0",
     "typescript": "~5.8.3"
+  },
+  "expo": {
+    "autolinking": {
+      "android": {
+        "exclude": [
+          "expo-keep-awake"
+        ]
+      }
+    }
   },
   "private": true
 }

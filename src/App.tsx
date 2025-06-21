@@ -22,6 +22,7 @@ export default function App() {
   async function bootStrapAsync() {
     await MusicPlayerService.setupTrackPlayer();
     await Database.initializeDatabaseConnection();
+    await Database.runMigrationsAsync();
   }
 
   useEffect(() => {
