@@ -8,9 +8,10 @@ import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { TStackNavigationRoutes } from "~/navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { InnertubeApi } from "~/api";
-import { asyncFuncExecutor } from "~/utils";
+import { asyncFuncExecutor, LocalStorage } from "~/utils";
 import { Playlist } from "~/models";
 import Animated, { FadeIn } from "react-native-reanimated";
+import * as Splashscreen from "expo-splash-screen";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "HomeScreen">,
@@ -26,6 +27,8 @@ type TPlaylist = {
 export default function HomeScreen({ navigation }: TProps) {
   const [playlists, setPlaylists] = useState<TPlaylist[]>();
   const theme = useTheme();
+
+  const isSetupComplete = LocalStorage.getItem("IS_INITIAL_SETUP_COMPLETE");
 
   async function bootStrapAsync() {
     setPlaylists([]);
@@ -44,12 +47,16 @@ export default function HomeScreen({ navigation }: TProps) {
       updatedData.push({ title: "Top Loved", iconName: "puzzle-heart", items: emraanHashmiList });
     }
     setPlaylists(updatedData);
+
+    if (!isSetupComplete) {
+      Splashscreen.hideAsync();
+      LocalStorage.setItem("IS_INITIAL_SETUP_COMPLETE", "true");
+    }
   }
 
   useEffect(() => {
     bootStrapAsync();
     console.log("ok");
-    
   }, []);
 
   return (

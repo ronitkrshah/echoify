@@ -8,7 +8,9 @@ import { StatusBar } from "expo-status-bar";
 import { Database } from "./database";
 import { MusicPlayerService } from "./services";
 import * as SplashScreen from "expo-splash-screen";
+import { LocalStorage } from "./utils";
 
+// Will hide in homescreen after data fetching
 SplashScreen.preventAutoHideAsync();
 
 SplashScreen.setOptions({
@@ -24,7 +26,9 @@ export default function App() {
 
   useEffect(() => {
     bootStrapAsync().finally(() => {
-      SplashScreen.hideAsync()
+      // This key will be added in homescreen
+      const isSetupComplete = LocalStorage.getItem("IS_INITIAL_SETUP_COMPLETE");
+      if (isSetupComplete) SplashScreen.hideAsync();
     });
   }, []);
 
