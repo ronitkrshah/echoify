@@ -1,21 +1,12 @@
 import Slider from "@react-native-community/slider";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import moment from "moment";
-import { useEffect, useState } from "react";
-import { Dimensions, Image, StyleSheet, ToastAndroid, View } from "react-native";
+import { useState } from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { IconButton, Surface, Text, useTheme } from "react-native-paper";
-import { useSharedValue, withTiming } from "react-native-reanimated";
-import TrackPlayer, {
-  Event,
-  PlaybackState,
-  State,
-  Track,
-  useActiveTrack,
-  useIsPlaying,
-  useProgress,
-} from "react-native-track-player";
+import Animated from "react-native-reanimated";
+import TrackPlayer, { useActiveTrack, useIsPlaying, useProgress } from "react-native-track-player";
 import { TStackNavigationRoutes } from "~/navigation";
-import { MusicPlayerService } from "~/services";
 import { SharedPlaylistModule } from "../playlist";
 import { Music } from "~/models";
 
@@ -26,9 +17,7 @@ export default function PlayerControllerScreen({ route }: TProps) {
   const { duration, position } = useProgress(1000);
   const { bufferingDuringPlay, playing } = useIsPlaying();
   const activeTrack = useActiveTrack();
-
   const theme = useTheme();
-
   return (
     <View style={styles.container}>
       <Surface
@@ -54,11 +43,11 @@ export default function PlayerControllerScreen({ route }: TProps) {
           }}
         >
           {activeTrack ? (
-            <Image
+            <Animated.Image
               source={{
                 uri: activeTrack?.artwork,
               }}
-              style={StyleSheet.absoluteFillObject}
+              style={[StyleSheet.absoluteFillObject]}
             />
           ) : (
             <IconButton icon={"disc"} size={250} />
@@ -90,7 +79,12 @@ export default function PlayerControllerScreen({ route }: TProps) {
 
       <Surface style={[styles.surface, { backgroundColor: theme.colors.primaryContainer }]}>
         <View style={{ flexDirection: "row" }}>
-          <IconButton icon={"repeat"} />
+          <IconButton
+            icon={"playlist-plus"}
+            onPress={() => {
+              setShowPlaylistAddDialog(true);
+            }}
+          />
           <IconButton icon={"skip-previous"} onPress={() => TrackPlayer.skipToPrevious()} />
           <IconButton
             disabled={bufferingDuringPlay}
@@ -107,12 +101,6 @@ export default function PlayerControllerScreen({ route }: TProps) {
           />
           <IconButton icon={"skip-next"} onPress={() => TrackPlayer.skipToNext()} />
           <IconButton icon={"stop"} onPress={() => TrackPlayer.stop()} />
-          <IconButton
-            icon={"playlist-plus"}
-            onPress={() => {
-              setShowPlaylistAddDialog(true);
-            }}
-          />
         </View>
       </Surface>
       {activeTrack && (
