@@ -3,20 +3,53 @@ import { Fragment } from "react";
 import { FlatList, ScrollView, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import { InnertubeApi } from "~/api";
-import { SkeletonLoader } from "~/core/components";
+import { SkeletonLoader, useLoadingDialog } from "~/core/components";
 import { MusicListItem } from "~/features/__shared__/components";
 import { Music } from "~/models";
+import { VirtualMusicPlayerService } from "~/core/services";
+import { asyncFuncExecutor } from "~/core/utils";
+import { NativeBottomTabNavigationProp } from "@bottom-tabs/react-navigation";
+import { CompositeNavigationProp, useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import TrackPlayer from "react-native-track-player";
+import { TStackNavigationRoutes } from "~/navigation";
+import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
+
+type Navigation = CompositeNavigationProp<
+  NativeBottomTabNavigationProp<TBottomTabRoutes, "HomeScreen">,
+  NativeStackNavigationProp<TStackNavigationRoutes>
+>;
 
 export default function TrendingSongsList() {
   const newSongs = useQuery({
     queryKey: ["new_songs"],
     queryFn: () => InnertubeApi.searchMusicsAsync("New Hindi Songs"),
   });
+  const loadingDialog = useLoadingDialog();
+  const navigation = useNavigation<Navigation>();
 
   function chunkArray(arr: Music[], size: number) {
     return Array.from({ length: Math.ceil(arr.length / size) }, (_, index) =>
       arr.slice(index * size, index * size + size)
     );
+  }
+
+  async function handleMusicPressAsync(music: Music) {
+    loadingDialog.show("Fetching Streams");
+    await VirtualMusicPlayerService.resetAsync();
+    VirtualMusicPlayerService.setQueueType("PLAYLIST");
+
+    VirtualMusicPlayerService.addMusicsToQueue(newSongs.data!);
+
+    const [track] = await asyncFuncExecutor(() =>
+      VirtualMusicPlayerService.getRNTPTrackFromMusicAsync(music)
+    );
+    navigation.push("PlayerControllerScreen");
+    loadingDialog.dismiss();
+    if (track) {
+      await TrackPlayer.add([track]);
+      TrackPlayer.play();
+    }
   }
 
   const chunkedData = chunkArray(newSongs.data ?? [], 3);
@@ -78,7 +111,7 @@ export default function TrendingSongsList() {
                       width: 300,
                     }}
                   >
-                    <MusicListItem music={music} />
+                    <MusicListItem onPress={handleMusicPressAsync} music={music} />
                   </View>
                 ))}
               </View>

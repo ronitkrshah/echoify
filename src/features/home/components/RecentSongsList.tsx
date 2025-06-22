@@ -1,11 +1,24 @@
+import { NativeBottomTabNavigationProp } from "@bottom-tabs/react-navigation";
+import { CompositeNavigationProp, useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
 import { ScrollView, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
-import { SkeletonLoader } from "~/core/components";
+import TrackPlayer from "react-native-track-player";
+import { SkeletonLoader, useLoadingDialog } from "~/core/components";
+import { VirtualMusicPlayerService } from "~/core/services";
+import { asyncFuncExecutor } from "~/core/utils";
 import { MusicListItem } from "~/features/__shared__/components";
 import { Music } from "~/models";
+import { TStackNavigationRoutes } from "~/navigation";
+import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import RecentsRepository from "~/repositories/RecentsRepository";
+
+type Navigation = CompositeNavigationProp<
+  NativeBottomTabNavigationProp<TBottomTabRoutes, "HomeScreen">,
+  NativeStackNavigationProp<TStackNavigationRoutes>
+>;
 
 export default function RecentSongsList() {
   const recentMusics = useQuery({
@@ -15,6 +28,30 @@ export default function RecentSongsList() {
     },
   });
   const theme = useTheme();
+  const navigation = useNavigation<Navigation>();
+  const loadingDialog = useLoadingDialog();
+
+  async function handleMusicPressAsync(music: Music) {
+    loadingDialog.show("Fetching Streams");
+    await VirtualMusicPlayerService.resetAsync();
+    VirtualMusicPlayerService.setQueueType("PLAYLIST");
+
+    const firstFewRecents = await RecentsRepository.getLimitedMusicsAsync(0, 20);
+
+    VirtualMusicPlayerService.addMusicsToQueue(
+      firstFewRecents!.map((it) => Music.convertFromSongEntity(it))
+    );
+
+    const [track] = await asyncFuncExecutor(() =>
+      VirtualMusicPlayerService.getRNTPTrackFromMusicAsync(music)
+    );
+    navigation.push("PlayerControllerScreen");
+    loadingDialog.dismiss();
+    if (track) {
+      await TrackPlayer.add([track]);
+      TrackPlayer.play();
+    }
+  }
 
   return (
     <View style={{ gap: 16 }}>
@@ -60,7 +97,10 @@ export default function RecentSongsList() {
                 width: 300,
               }}
             >
-              <MusicListItem music={Music.convertFromSongEntity(it)} />
+              <MusicListItem
+                onPress={handleMusicPressAsync}
+                music={Music.convertFromSongEntity(it)}
+              />
             </View>
           );
         })}
