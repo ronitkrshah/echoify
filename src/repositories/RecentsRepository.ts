@@ -42,6 +42,20 @@ class RecentsRepository {
     return list?.songs;
   }
 
+  public async getLimitedMusicsAsync(offset = 0, limit = 10): Promise<SongEntity[] | undefined> {
+    await this.createRecentsTableIfNotExists();
+    const list = await this._db
+      .createQueryBuilder("r")
+      .select([])
+      .leftJoin("r.songs", "songs")
+      .orderBy("songs.createdAt", "DESC")
+      .limit(limit)
+      .offset(offset)
+      .getRawMany();
+
+    return list;
+  }
+
   public async addSongToRecentsAsync(song: Track & { id: string }) {
     await this.createRecentsTableIfNotExists();
     const recents = await this._db.findOne({

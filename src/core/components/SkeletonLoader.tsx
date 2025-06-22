@@ -1,85 +1,67 @@
-import React from "react";
-import { View, StyleSheet, ViewStyle, StyleProp, DimensionValue } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import { ColorValue, View } from "react-native";
 import Animated, {
+  cancelAnimation,
+  Easing,
+  interpolate,
+  ReduceMotion,
   useAnimatedStyle,
+  useSharedValue,
   withRepeat,
   withTiming,
-  Easing,
 } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
+import { useEffect } from "react";
 
-type TSkeletonLoaderProps = {
-  visible?: boolean;
-  width?: number | DimensionValue;
-  height?: number;
-  borderRadius?: number;
-  style?: StyleProp<ViewStyle>;
-  containerStyle?: StyleProp<ViewStyle>;
-  backgroundColor?: string;
-  highlightColor?: string;
+type TSkeletonProps = {
+  height: number;
+  width: number;
+  colors: [ColorValue, ColorValue, ...ColorValue[]];
+  primaryBackground?: string;
+  cornerRadius?: number;
   duration?: number;
 };
 
-function SkeletonLoader({
-  visible = true,
-  width = "100%",
-  height = 20,
-  borderRadius = 8,
-  containerStyle,
-  backgroundColor = "#e0e0e0",
-  highlightColor = "#ffffff30",
-  duration = 1000,
-}: TSkeletonLoaderProps) {
-  const animatedStyle = useAnimatedStyle(() => {
+const ALinerGradient = Animated.createAnimatedComponent(LinearGradient);
+
+export default function SkeletonLoader({
+  height,
+  width,
+  primaryBackground = "gray",
+  cornerRadius = 0,
+  duration = 4000,
+  colors,
+}: TSkeletonProps) {
+  const position = useSharedValue(0);
+
+  useEffect(() => {
+    position.value = withRepeat(withTiming(1, { duration, easing: Easing.linear }), -1, false);
+
+    return () => {
+      cancelAnimation(position);
+    };
+  }, []);
+
+  const infiniteAnimationStyle = useAnimatedStyle(() => {
     return {
       transform: [
         {
-          translateX: withRepeat(
-            withTiming(1, {
-              duration,
-              easing: Easing.linear,
-            }),
-            -1,
-            false,
-          ),
+          translateX: interpolate(position.value, [0, 1], [-width, width]),
         },
+        { rotate: "90deg" },
       ],
     };
   });
-
-  if (!visible) return null;
-
   return (
     <View
-      style={[
-        {
-          width,
-          height,
-          overflow: "hidden",
-          borderRadius,
-          backgroundColor,
-        },
-        containerStyle,
-      ]}
+      style={{
+        height,
+        width,
+        backgroundColor: primaryBackground,
+        borderRadius: cornerRadius,
+        overflow: "hidden",
+      }}
     >
-      <Animated.View
-        style={[
-          {
-            ...StyleSheet.absoluteFillObject,
-            transform: [{ translateX: -200 }],
-          },
-          animatedStyle,
-        ]}
-      >
-        <LinearGradient
-          colors={[backgroundColor, highlightColor, backgroundColor]}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          style={StyleSheet.absoluteFill}
-        />
-      </Animated.View>
+      <ALinerGradient style={[{ width: height, height }, infiniteAnimationStyle]} colors={colors} />
     </View>
   );
 }
-
-export default SkeletonLoader;
