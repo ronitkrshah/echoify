@@ -4,18 +4,9 @@ import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { TStackNavigationRoutes } from "~/navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
-import { SkeletonLoader } from "~/core/components";
 import { Text, useTheme } from "react-native-paper";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
-import { Fragment, useEffect, useState } from "react";
-import RecentsRepository from "~/repositories/RecentsRepository";
-import { SongEntity } from "~/database/entities";
-import { useQueries, useQuery } from "@tanstack/react-query";
-import Animated, { FadeIn } from "react-native-reanimated";
-import { MusicListItem } from "../__shared__/components";
-import { Music } from "~/models";
-import { sleepThreadAsync } from "~/core/utils";
-import { RecentSongsList } from "./components";
+import { Playlists, RecentSongsList } from "./components";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "HomeScreen">,
@@ -26,7 +17,9 @@ export default function HomeScreen({ navigation }: TProps) {
   const theme = useTheme();
 
   return (
-    <View style={{ flex: 1, paddingHorizontal: 16, gap: 20 }}>
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, gap: 40, paddingBottom: 16 }}
+    >
       <Pressable
         style={[{ backgroundColor: theme.colors.primaryContainer }, styles.searchBar]}
         onPress={() => {
@@ -36,13 +29,13 @@ export default function HomeScreen({ navigation }: TProps) {
         <MaterialDesignIcons name="magnify" size={24} />
         <Text variant="titleMedium">Search</Text>
       </Pressable>
-
       <RecentSongsList />
 
-      <View>
-        <ScrollView></ScrollView>
-      </View>
-    </View>
+      <Playlists query="Trending Songs" headerTitle="Trending" />
+      <Playlists query="Romantic Songs New" headerTitle="Romantic" />
+      <Playlists query="Honey Singh Songs" headerTitle="Honey Singh" />
+      <Playlists query="Alan Walker Songs" headerTitle="Alan Walker" />
+    </ScrollView>
   );
 }
 const styles = StyleSheet.create({

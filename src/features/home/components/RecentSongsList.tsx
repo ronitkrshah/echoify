@@ -12,7 +12,6 @@ export default function RecentSongsList() {
   const recentMusics = useQuery({
     queryKey: ["recents"],
     queryFn: async () => {
-      await sleepThreadAsync(5000);
       return (await RecentsRepository.getLimitedMusicsAsync(0, 3)) ?? [];
     },
   });
