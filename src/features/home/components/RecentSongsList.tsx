@@ -3,7 +3,6 @@ import { Fragment } from "react";
 import { ScrollView, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import { SkeletonLoader } from "~/core/components";
-import { sleepThreadAsync } from "~/core/utils";
 import { MusicListItem } from "~/features/__shared__/components";
 import { Music } from "~/models";
 import RecentsRepository from "~/repositories/RecentsRepository";
@@ -57,6 +56,8 @@ export default function RecentSongsList() {
                 backgroundColor: theme.colors.secondaryContainer,
                 borderRadius: 40,
                 overflow: "hidden",
+                flexWrap: "wrap",
+                width: 300,
               }}
             >
               <MusicListItem music={Music.convertFromSongEntity(it)} />

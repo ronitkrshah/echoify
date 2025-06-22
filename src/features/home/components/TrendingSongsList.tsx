@@ -1,0 +1,91 @@
+import { useQuery } from "@tanstack/react-query";
+import { Fragment } from "react";
+import { FlatList, ScrollView, View } from "react-native";
+import { Text, useTheme } from "react-native-paper";
+import { InnertubeApi } from "~/api";
+import { SkeletonLoader } from "~/core/components";
+import { MusicListItem } from "~/features/__shared__/components";
+import { Music } from "~/models";
+
+export default function TrendingSongsList() {
+  const newSongs = useQuery({
+    queryKey: ["new_songs"],
+    queryFn: () => InnertubeApi.searchMusicsAsync("New Hindi Songs"),
+  });
+
+  function chunkArray(arr: Music[], size: number) {
+    return Array.from({ length: Math.ceil(arr.length / size) }, (_, index) =>
+      arr.slice(index * size, index * size + size)
+    );
+  }
+
+  const chunkedData = chunkArray(newSongs.data ?? [], 3);
+
+  const theme = useTheme();
+  return (
+    <View>
+      {newSongs.isFetching && (
+        <ScrollView
+          horizontal
+          contentContainerStyle={{ gap: 16 }}
+          showsHorizontalScrollIndicator={false}
+        >
+          {new Array(2).fill("-").map((it, index) => {
+            return (
+              <View style={{ gap: 16 }} key={index.toString()}>
+                {new Array(3).fill("-").map((it, index) => {
+                  return (
+                    <SkeletonLoader
+                      key={index.toString()}
+                      height={70}
+                      width={300}
+                      cornerRadius={40}
+                      colors={["transparent", theme.colors.inversePrimary, "transparent"]}
+                      primaryBackground={theme.colors.secondaryContainer}
+                    />
+                  );
+                })}
+              </View>
+            );
+          })}
+        </ScrollView>
+      )}
+
+      {newSongs.data && !newSongs.isFetching && (
+        <Fragment>
+          <Text
+            variant="titleLarge"
+            style={{ color: theme.colors.primary, fontWeight: "bold", marginBottom: 16 }}
+          >
+            Latest Songs
+          </Text>
+          <FlatList
+            data={chunkedData}
+            horizontal
+            keyExtractor={(_, index) => index.toString()}
+            contentContainerStyle={{ gap: 16 }}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <View style={{ flexDirection: "column", gap: 16 }}>
+                {item.map((music, idx) => (
+                  <View
+                    key={music.videoId}
+                    style={{
+                      backgroundColor: theme.colors.secondaryContainer,
+                      borderRadius: 40,
+                      overflow: "hidden",
+                      marginBottom: 10,
+                      width: 300,
+                    }}
+                  >
+                    <MusicListItem music={music} />
+                  </View>
+                ))}
+              </View>
+            )}
+          />
+        </Fragment>
+      )}
+    </View>
+  );
+}

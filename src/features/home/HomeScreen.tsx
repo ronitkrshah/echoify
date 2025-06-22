@@ -6,7 +6,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
-import { Playlists, RecentSongsList } from "./components";
+import { Playlists, RecentSongsList, TrendingSongsList } from "./components";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "HomeScreen">,
@@ -17,9 +17,7 @@ export default function HomeScreen({ navigation }: TProps) {
   const theme = useTheme();
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, gap: 40, paddingBottom: 16 }}
-    >
+    <View style={{ flex: 1, gap: 20 }}>
       <Pressable
         style={[{ backgroundColor: theme.colors.primaryContainer }, styles.searchBar]}
         onPress={() => {
@@ -29,13 +27,17 @@ export default function HomeScreen({ navigation }: TProps) {
         <MaterialDesignIcons name="magnify" size={24} />
         <Text variant="titleMedium">Search</Text>
       </Pressable>
-      <RecentSongsList />
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, gap: 40, paddingBottom: 16 }}
+      >
+        <RecentSongsList />
 
-      <Playlists query="Trending Songs" headerTitle="Trending" />
-      <Playlists query="Romantic Songs New" headerTitle="Romantic" />
-      <Playlists query="Honey Singh Songs" headerTitle="Honey Singh" />
-      <Playlists query="Alan Walker Songs" headerTitle="Alan Walker" />
-    </ScrollView>
+        <TrendingSongsList />
+
+        <Playlists query="Trending Songs" headerTitle="Trending" />
+        <Playlists query="Romantic Songs New" headerTitle="Romantic" />
+      </ScrollView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
@@ -44,5 +46,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 16,
     gap: 16,
+    marginHorizontal: 16,
   },
 });
