@@ -46,6 +46,17 @@ class RecentsRepository {
     await this.createRecentsTableIfNotExists();
     const list = await this._db
       .createQueryBuilder("r")
+      .select([
+        "songs.createdAt AS createdAt",
+        "songs.duration AS duration",
+        "songs.id AS id",
+        "r.name AS name",
+        "r.id AS recentId",
+        "songs.songId AS songId",
+        "songs.thumbnail AS thumbnail",
+        "songs.title AS title",
+        "songs.uploadedBy AS uploadedBy",
+      ])
       .innerJoin("r.songs", "songs")
       .orderBy("songs.createdAt", "DESC")
       .limit(limit)
