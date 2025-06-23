@@ -108,7 +108,7 @@ export default function SearchScreen({ navigation }: TProps) {
           const isRecentQuery = typeof item.id === "number";
 
           return (
-            <View style={{ borderRadius: 16, overflow: "hidden" }}>
+            <View style={{ borderRadius: 10, overflow: "hidden" }}>
               <Pressable
                 style={{
                   padding: 6,
@@ -125,22 +125,30 @@ export default function SearchScreen({ navigation }: TProps) {
                 }}
                 onPress={() => navigation.push("SearchResultsScreen", { query: item.suggestion })}
               >
+                {/* Left section */}
                 <View
                   style={{
                     flexDirection: "row",
-                    gap: 6,
                     alignItems: "center",
+                    flexShrink: 1,
                   }}
                 >
-                  <MaterialDesignIcons name="magnify" size={20} />
-                  <Text variant="titleMedium">{item.suggestion}</Text>
+                  <MaterialDesignIcons name="magnify" size={20} style={{ marginRight: 6 }} />
+                  <Text
+                    variant="titleMedium"
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                    style={{ flexShrink: 1 }}
+                  >
+                    {item.suggestion}
+                  </Text>
                 </View>
+
+                {/* Right icon */}
                 <MaterialDesignIcons
                   name="arrow-top-left"
                   size={20}
-                  onPress={() => {
-                    setQuery(item.suggestion);
-                  }}
+                  onPress={() => setQuery(item.suggestion)}
                 />
               </Pressable>
             </View>
