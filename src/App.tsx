@@ -12,7 +12,6 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
-        <StatusBar animated style="auto" />
         <MaterialYouTheme>
           <LoadingDialogProvider>
             <AlertDialogProvider>
