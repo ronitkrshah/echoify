@@ -135,7 +135,13 @@ export default function SearchScreen({ navigation }: TProps) {
                   <MaterialDesignIcons name="magnify" size={20} />
                   <Text variant="titleMedium">{item.suggestion}</Text>
                 </View>
-                {isRecentQuery && <MaterialDesignIcons name="history" size={20} />}
+                <MaterialDesignIcons
+                  name="arrow-top-left"
+                  size={20}
+                  onPress={() => {
+                    setQuery(item.suggestion);
+                  }}
+                />
               </Pressable>
             </View>
           );

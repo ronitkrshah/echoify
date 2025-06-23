@@ -4,7 +4,7 @@ import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { TStackNavigationRoutes } from "~/navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
-import { Text, useTheme } from "react-native-paper";
+import { FAB, Text, useTheme } from "react-native-paper";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { Playlists, RecentSongsList, TrendingSongsList } from "./components";
 
@@ -37,6 +37,12 @@ export default function HomeScreen({ navigation }: TProps) {
         <Playlists query="Trending Songs" headerTitle="Trending" />
         <Playlists query="Romantic Songs New" headerTitle="Romantic" />
       </ScrollView>
+
+      <FAB
+        icon={"disc"}
+        style={styles.fab}
+        onPress={() => navigation.push("PlayerControllerScreen")}
+      />
     </View>
   );
 }
@@ -47,5 +53,10 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 16,
     marginHorizontal: 16,
+  },
+  fab: {
+    position: "absolute",
+    bottom: 16,
+    right: 16,
   },
 });
