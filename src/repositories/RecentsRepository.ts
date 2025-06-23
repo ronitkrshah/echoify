@@ -46,8 +46,7 @@ class RecentsRepository {
     await this.createRecentsTableIfNotExists();
     const list = await this._db
       .createQueryBuilder("r")
-      .select([])
-      .leftJoin("r.songs", "songs")
+      .innerJoin("r.songs", "songs")
       .orderBy("songs.createdAt", "DESC")
       .limit(limit)
       .offset(offset)
