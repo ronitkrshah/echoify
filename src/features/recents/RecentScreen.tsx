@@ -2,7 +2,7 @@ import { NativeBottomTabScreenProps } from "@bottom-tabs/react-navigation";
 import { CompositeScreenProps } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useState } from "react";
-import { FlatList, RefreshControl, View } from "react-native";
+import { FlatList, RefreshControl, ToastAndroid, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SongEntity } from "~/database/entities";
 import { TStackNavigationRoutes } from "~/navigation";
@@ -30,20 +30,18 @@ export default function RecentScreen({ navigation }: TProps) {
   const loadingDialog = useLoadingDialog();
 
   async function handleMusicPressAsync(music: Music) {
-    loadingDialog.show("Fetching Streams");
-    await VirtualMusicPlayerService.resetAsync();
-    VirtualMusicPlayerService.setQueueType("PLAYLIST");
-    VirtualMusicPlayerService.addMusicsToQueue(
-      recentSongs.map((it) => Music.convertFromSongEntity(it))
-    );
-    const [track] = await asyncFuncExecutor(() =>
-      VirtualMusicPlayerService.getRNTPTrackFromMusicAsync(music)
-    );
-    navigation.push("PlayerControllerScreen");
-    loadingDialog.dismiss();
-    if (track) {
-      await TrackPlayer.add([track]);
-      TrackPlayer.play();
+    try {
+      loadingDialog.show("Fetching Streams");
+      VirtualMusicPlayerService.setQueueType("PLAYLIST");
+      await VirtualMusicPlayerService.playMusicAsync(
+        music,
+        recentSongs.map((it) => Music.convertFromSongEntity(it))
+      );
+      navigation.push("PlayerControllerScreen");
+    } catch (error) {
+      ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
+    } finally {
+      loadingDialog.dismiss();
     }
   }
 

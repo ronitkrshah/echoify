@@ -30,22 +30,15 @@ export default function YoutubePlaylistDetailsScreen({ navigation, route }: TPro
   const loadingDialog = useLoadingDialog();
 
   async function handleMusicPressAsync(music: Music) {
-    if (!playlistDetails) {
-      ToastAndroid.show("List Unavailable", ToastAndroid.SHORT);
-      return;
-    }
-    loadingDialog.show("Fetching Streams");
-    await VirtualMusicPlayerService.resetAsync();
-    VirtualMusicPlayerService.setQueueType("PLAYLIST");
-    VirtualMusicPlayerService.addMusicsToQueue(playlistDetails.videos);
-    const [track] = await asyncFuncExecutor(() =>
-      VirtualMusicPlayerService.getRNTPTrackFromMusicAsync(music)
-    );
-    navigation.push("PlayerControllerScreen");
-    loadingDialog.dismiss();
-    if (track) {
-      await TrackPlayer.add([track]);
-      TrackPlayer.play();
+    try {
+      loadingDialog.show("Fetching Streams");
+      VirtualMusicPlayerService.setQueueType("PLAYLIST");
+      await VirtualMusicPlayerService.playMusicAsync(music, playlistDetails?.videos);
+      navigation.push("PlayerControllerScreen");
+    } catch (error) {
+      ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
+    } finally {
+      loadingDialog.dismiss();
     }
   }
 

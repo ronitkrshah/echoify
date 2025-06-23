@@ -134,6 +134,15 @@ class VirtualMuisicPlayerService {
 
     return Music.convertMusicToRNTPTrack(music, url);
   }
+
+  /** Play Music */
+  async playMusicAsync(music: Music, queueList: Music[] = []) {
+    await this.resetAsync();
+    this.addMusicsToQueue(queueList.length === 0 ? [music] : queueList);
+    const track = await this.getRNTPTrackFromMusicAsync(music);
+    await TrackPlayer.add([track]);
+    await TrackPlayer.play();
+  }
 }
 
 export default new VirtualMuisicPlayerService();

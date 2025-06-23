@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
-import { FlatList, ScrollView, View } from "react-native";
+import { FlatList, ScrollView, ToastAndroid, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import { InnertubeApi } from "~/api";
 import { SkeletonLoader, useLoadingDialog } from "~/core/components";
@@ -35,20 +35,15 @@ export default function TrendingSongsList() {
   }
 
   async function handleMusicPressAsync(music: Music) {
-    loadingDialog.show("Fetching Streams");
-    await VirtualMusicPlayerService.resetAsync();
-    VirtualMusicPlayerService.setQueueType("PLAYLIST");
-
-    VirtualMusicPlayerService.addMusicsToQueue(newSongs.data!);
-
-    const [track] = await asyncFuncExecutor(() =>
-      VirtualMusicPlayerService.getRNTPTrackFromMusicAsync(music)
-    );
-    navigation.push("PlayerControllerScreen");
-    loadingDialog.dismiss();
-    if (track) {
-      await TrackPlayer.add([track]);
-      TrackPlayer.play();
+    try {
+      loadingDialog.show("Fetching Streams");
+      VirtualMusicPlayerService.setQueueType("PLAYLIST");
+      await VirtualMusicPlayerService.playMusicAsync(music, newSongs.data);
+      navigation.push("PlayerControllerScreen");
+    } catch (error) {
+      ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
+    } finally {
+      loadingDialog.dismiss();
     }
   }
 

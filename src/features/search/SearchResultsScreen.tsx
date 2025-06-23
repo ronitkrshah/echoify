@@ -38,18 +38,13 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
       }
     }
 
-    loadingDialog.show("Fetching Streams");
-    navigation.push("PlayerControllerScreen");
-
     try {
-      await VirtualMusicPlayerService.resetAsync();
-      const newTrack = await VirtualMusicPlayerService.getRNTPTrackFromMusicAsync(music);
+      loadingDialog.show("Fetching Streams");
       VirtualMusicPlayerService.setQueueType("NORMAL");
-      VirtualMusicPlayerService.addMusicsToQueue([music]);
-      loadingDialog.dismiss();
-      await TrackPlayer.add([newTrack]);
-      await TrackPlayer.play();
+      await VirtualMusicPlayerService.playMusicAsync(music);
+      navigation.push("PlayerControllerScreen");
     } catch (error) {
+      ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     } finally {
       loadingDialog.dismiss();
     }

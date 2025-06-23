@@ -3,7 +3,7 @@ import { CompositeNavigationProp, useNavigation } from "@react-navigation/native
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, ToastAndroid, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import TrackPlayer from "react-native-track-player";
 import { SkeletonLoader, useLoadingDialog } from "~/core/components";
@@ -32,24 +32,19 @@ export default function RecentSongsList() {
   const loadingDialog = useLoadingDialog();
 
   async function handleMusicPressAsync(music: Music) {
-    loadingDialog.show("Fetching Streams");
-    await VirtualMusicPlayerService.resetAsync();
-    VirtualMusicPlayerService.setQueueType("PLAYLIST");
-
-    const firstFewRecents = await RecentsRepository.getLimitedMusicsAsync(0, 20);
-
-    VirtualMusicPlayerService.addMusicsToQueue(
-      firstFewRecents!.map((it) => Music.convertFromSongEntity(it))
-    );
-
-    const [track] = await asyncFuncExecutor(() =>
-      VirtualMusicPlayerService.getRNTPTrackFromMusicAsync(music)
-    );
-    navigation.push("PlayerControllerScreen");
-    loadingDialog.dismiss();
-    if (track) {
-      await TrackPlayer.add([track]);
-      TrackPlayer.play();
+    try {
+      loadingDialog.show("Fetching Streams");
+      VirtualMusicPlayerService.setQueueType("PLAYLIST");
+      const firstFewRecents = await RecentsRepository.getLimitedMusicsAsync(0, 20);
+      await VirtualMusicPlayerService.playMusicAsync(
+        music,
+        firstFewRecents!.map((it) => Music.convertFromSongEntity(it))
+      );
+      navigation.push("PlayerControllerScreen");
+    } catch (error) {
+      ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
+    } finally {
+      loadingDialog.dismiss();
     }
   }
 
