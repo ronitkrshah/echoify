@@ -1,5 +1,4 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import moment from "moment";
 import { useEffect, useState } from "react";
 import { Image, Pressable, StyleSheet, ToastAndroid, View } from "react-native";
 import { ActivityIndicator, Text, useTheme } from "react-native-paper";
@@ -9,9 +8,8 @@ import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useLoadingDialog } from "~/core/components";
 import { Music } from "~/models";
 import { InnertubeApi } from "~/api";
-import { asyncFuncExecutor } from "~/core/utils";
 import TrackPlayer from "react-native-track-player";
-import { MusicPlayerService, VirtualMusicPlayerService } from "~/core/services";
+import { VirtualMusicPlayerService } from "~/core/services";
 import { Database } from "~/database";
 import { PlaylistEntity, SongEntity } from "~/database/entities";
 import { MusicListItem } from "../__shared__/components";
@@ -71,7 +69,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
         relations: ["songs"], // important: load related songs
       });
 
-      if (!playlist) throw new Error("Playlist not found");
+      if (!playlist) return
 
       // Step 3: Add the new song if it's not already in the playlist
       const alreadyExists = playlist.songs.some((song) => song.songId === addedSong.songId);
@@ -94,7 +92,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
           navigation.goBack();
         }}
       >
-        <MaterialDesignIcons name="magnify" size={24} />
+        <MaterialDesignIcons color={theme.colors.onBackground} name="magnify" size={24} />
         <Text variant="titleMedium">{route.params.query}</Text>
       </Pressable>
 

@@ -7,7 +7,7 @@ import { SearchEntity } from "~/database/entities";
 import { useDebounce } from "~/hooks";
 import { asyncFuncExecutor } from "~/core/utils";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
-import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
+import Animated, { LinearTransition } from "react-native-reanimated";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { TStackNavigationRoutes } from "~/navigation";
 import { InnertubeApi } from "~/api";
@@ -100,10 +100,10 @@ export default function SearchScreen({ navigation }: TProps) {
         data={suggestions}
         keyExtractor={(item) => item.id?.toString()}
         contentContainerStyle={{ paddingVertical: 16, gap: 12 }}
-        renderItem={({ item, index }) => {
+        renderItem={({ item }) => {
           /**
-           * We storing number and string both for ids. So If it's number then
-           * it comes from db else it's fromapi
+           * We're storing number and string both for ids. So If it's number then
+           * it comes from db else it's from api
            */
           const isRecentQuery = typeof item.id === "number";
 
@@ -120,7 +120,7 @@ export default function SearchScreen({ navigation }: TProps) {
                 onLongPress={async () => {
                   if (isRecentQuery && typeof item.id === "number") {
                     await removeSearchSuggestionFromDatabaseAsync(item.id);
-                    bootStrapAsync();
+                    await bootStrapAsync();
                   }
                 }}
                 onPress={() => navigation.push("SearchResultsScreen", { query: item.suggestion })}
@@ -133,7 +133,7 @@ export default function SearchScreen({ navigation }: TProps) {
                     flexShrink: 1,
                   }}
                 >
-                  <MaterialDesignIcons name="magnify" size={20} style={{ marginRight: 6 }} />
+                  <MaterialDesignIcons color={theme.colors.onBackground} name="magnify" size={20} style={{ marginRight: 6 }} />
                   <Text
                     variant="titleMedium"
                     numberOfLines={2}
@@ -146,6 +146,7 @@ export default function SearchScreen({ navigation }: TProps) {
 
                 {/* Right icon */}
                 <MaterialDesignIcons
+                  color={theme.colors.onBackground}
                   name="arrow-top-left"
                   size={20}
                   onPress={() => setQuery(item.suggestion)}

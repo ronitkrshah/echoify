@@ -24,7 +24,7 @@ export default function HomeScreen({ navigation }: TProps) {
           navigation.push("SearchScreen");
         }}
       >
-        <MaterialDesignIcons name="magnify" size={24} />
+        <MaterialDesignIcons name="magnify" size={24} color={theme.colors.onBackground} />
         <Text variant="titleMedium">Search</Text>
       </Pressable>
       <ScrollView

@@ -4,7 +4,6 @@ import { useTheme } from "react-native-paper";
 import { HomeScreen } from "~/features/home";
 import { PlaylistScreen } from "~/features/playlist";
 import { RecentScreen } from "~/features/recents";
-import { SettingsScreen } from "~/features/settings";
 
 export type TBottomTabRoutes = {
   HomeScreen: undefined;
@@ -24,7 +23,7 @@ export default function BottomTabsNavigation() {
   const theme = useTheme();
   return (
     <Tabs.Navigator
-      tabBarInactiveTintColor={theme.colors.scrim}
+      tabBarInactiveTintColor={theme.colors.onPrimaryContainer}
       screenOptions={{
         tabBarActiveTintColor: theme.colors.primary,
       }}

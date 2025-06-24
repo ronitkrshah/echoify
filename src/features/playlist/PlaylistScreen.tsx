@@ -1,18 +1,9 @@
 import { useEffect, useState } from "react";
-import {
-  Dimensions,
-  FlatList,
-  KeyboardAvoidingView,
-  Pressable,
-  StyleSheet,
-  View,
-} from "react-native";
+import { Dimensions, KeyboardAvoidingView, Pressable, StyleSheet, View } from "react-native";
 import { FAB, Text, useTheme } from "react-native-paper";
 import { NewPlaylistDialog } from "./components";
-import { Database } from "~/database";
-import { PlaylistEntity } from "~/database/entities";
-import Animated, { FadeIn, FadeInDown, LinearTransition } from "react-native-reanimated";
-import MaterialCommunityIcons from "@react-native-vector-icons/material-design-icons";
+import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { TStackNavigationRoutes } from "~/navigation";
 import { CompositeScreenProps } from "@react-navigation/native";
@@ -32,11 +23,9 @@ export default function PlaylistScreen({ navigation }: TProps) {
   const theme = useTheme();  
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
+    return navigation.addListener("focus", () => {
       LocalPlaylistRepository.getAllPlaylistAsync().then(setPlaylists)
     });
-
-    return unsubscribe;
   }, []);
 
   return (
@@ -53,7 +42,7 @@ export default function PlaylistScreen({ navigation }: TProps) {
                   alignItems: "center",
                 }}
               >
-                <MaterialCommunityIcons name="playlist-plus" size={60} />
+                <MaterialDesignIcons color={theme.colors.onBackground} name="playlist-plus" size={60} />
                 <Text variant="titleLarge">You Don't Have Any Playlists</Text>
               </View>
             )}
@@ -88,7 +77,7 @@ export default function PlaylistScreen({ navigation }: TProps) {
                       justifyContent: "center",
                     }}
                   >
-                    <MaterialCommunityIcons name="playlist-music" size={70} />
+                    <MaterialDesignIcons color={theme.colors.onBackground} name="playlist-music" size={70} />
                     <Text variant="titleMedium" numberOfLines={2} style={{ textAlign: "center" }}>
                       {item.name}
                     </Text>
