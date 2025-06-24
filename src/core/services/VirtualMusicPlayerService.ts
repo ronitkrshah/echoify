@@ -16,7 +16,7 @@ import { asyncFuncExecutor } from "~/core/utils";
  *
  * This class will handle upcoming music
  */
-class VirtualMuisicPlayerService {
+class VirtualMusicPlayerService {
   private _queue: Music[] = [];
   private _playedSongs = new Set<string>();
 
@@ -38,7 +38,7 @@ class VirtualMuisicPlayerService {
     if (!event.track) return;
     this._isEventProcessing = true;
 
-    // Prevent furthur exec is track is stopped
+    // Prevent further exec is track is stopped
     const state = await TrackPlayer.getPlaybackState();
     if (state.state === State.Stopped) return;
 
@@ -150,4 +150,4 @@ class VirtualMuisicPlayerService {
   }
 }
 
-export default new VirtualMuisicPlayerService();
+export default new VirtualMusicPlayerService();
