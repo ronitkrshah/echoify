@@ -1,6 +1,7 @@
 import TrackPlayer, {
   Event,
   PlaybackActiveTrackChangedEvent,
+  State,
   Track,
 } from "react-native-track-player";
 import { InnertubeApi } from "~/api";
@@ -36,6 +37,10 @@ class VirtualMuisicPlayerService {
     if (this._isEventProcessing) return;
     if (!event.track) return;
     this._isEventProcessing = true;
+
+    // Prevent furthur exec is track is stopped
+    const state = await TrackPlayer.getPlaybackState();
+    if (state.state === State.Stopped) return;
 
     try {
       RecentsRepository.addSongToRecentsAsync(event.track as Track & { id: string });

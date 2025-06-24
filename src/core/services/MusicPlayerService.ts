@@ -18,14 +18,10 @@ class MusicPlayerService {
     TrackPlayer.addEventListener(Event.RemotePrevious, () => TrackPlayer.skipToPrevious());
     TrackPlayer.addEventListener(Event.RemoteNext, () => TrackPlayer.skipToNext());
     TrackPlayer.addEventListener(Event.RemoteSeek, (val) => TrackPlayer.seekTo(val.position));
-
+    TrackPlayer.addEventListener(Event.RemoteStop, () => VirtualMusicPlayerService.resetAsync());
     TrackPlayer.addEventListener(Event.PlaybackActiveTrackChanged, (e) =>
       VirtualMusicPlayerService.handlePlayBackActiveTrackChangeEventAsync(e)
     );
-
-    TrackPlayer.addEventListener(Event.PlaybackError, (e) => {
-      console.log(e);
-    });
   }
 
   public async setupTrackPlayer() {
