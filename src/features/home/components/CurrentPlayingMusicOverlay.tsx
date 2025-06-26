@@ -70,7 +70,7 @@ export default function CurrentPlayingMusicOverlay() {
     >
       <Pressable
         style={styles.container}
-        android_ripple={{ color: "red" }}
+        android_ripple={{ color: theme.colors.primary }}
         onPress={() => {
           playerController.showModal();
         }}

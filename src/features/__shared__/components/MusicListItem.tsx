@@ -37,7 +37,11 @@ export default function MusicListItem({ music, onPress, onLongPress }: TProps) {
           }}
         >
           <Text numberOfLines={2}>{music.title}</Text>
-          <Text style={{ fontStyle: "italic", color: theme.colors.secondary }} variant="labelLarge">
+          <Text
+            style={{ fontStyle: "italic", color: theme.colors.secondary }}
+            numberOfLines={1}
+            variant="labelLarge"
+          >
             {music.author}
           </Text>
         </View>

@@ -56,7 +56,7 @@ function PlayerControllerBottomSheet({}: {}, ref: ForwardedRef<TPlayerController
         enableDynamicSizing
         enablePanDownToClose
         handleIndicatorStyle={{ backgroundColor: theme.colors.primary }}
-        backgroundStyle={{ borderRadius: 40 }}
+        backgroundStyle={{ borderRadius: 40, backgroundColor: theme.colors.surface }}
       >
         <BottomSheetView style={{ padding: 16, paddingBottom: 30 }}>
           <PlayerController />

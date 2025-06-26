@@ -20,7 +20,7 @@ export default function PlayerController() {
         style={[
           styles.surface,
           {
-            backgroundColor: theme.colors.primaryContainer,
+            backgroundColor: theme.dark ? theme.colors.primary : theme.colors.primaryContainer,
             width: "98%",
             alignItems: "center",
             justifyContent: "center",
@@ -53,13 +53,19 @@ export default function PlayerController() {
           <Text
             numberOfLines={2}
             variant="titleLarge"
-            style={{ fontWeight: "bold", color: theme.colors.primary, textAlign: "center" }}
+            style={{
+              fontWeight: "bold",
+              color: theme.dark ? theme.colors.onPrimary : theme.colors.primary,
+              textAlign: "center",
+            }}
           >
             {activeTrack?.title ?? "No Active Tracks"}
           </Text>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text>{moment.utc(position * 1000).format("mm:ss")}</Text>
+          <Text style={{ color: theme.dark ? theme.colors.onPrimary : theme.colors.primary }}>
+            {moment.utc(position * 1000).format("mm:ss")}
+          </Text>
           <Slider
             onSlidingComplete={(val) => {
               TrackPlayer.seekTo(val);
@@ -67,13 +73,20 @@ export default function PlayerController() {
             minimumValue={0}
             maximumValue={duration}
             value={position}
+            thumbTintColor={theme.dark ? theme.colors.onPrimary : theme.colors.primary}
+            maximumTrackTintColor={
+              theme.dark ? theme.colors.primaryContainer : theme.colors.tertiary
+            }
+            minimumTrackTintColor={theme.dark ? theme.colors.onPrimary : theme.colors.primary}
             style={{ width: Dimensions.get("window").width * 0.6, height: 60 }}
           />
-          <Text>{moment.utc(duration * 1000).format("mm:ss")}</Text>
+          <Text style={{ color: theme.dark ? theme.colors.onPrimary : theme.colors.primary }}>
+            {moment.utc(duration * 1000).format("mm:ss")}
+          </Text>
         </View>
       </Surface>
 
-      <Surface style={[styles.surface, { backgroundColor: theme.colors.primaryContainer }]}>
+      <Surface style={[styles.surface, { backgroundColor: theme.colors.elevation.level5 }]}>
         <View style={{ flexDirection: "row" }}>
           <IconButton
             icon={"playlist-plus"}

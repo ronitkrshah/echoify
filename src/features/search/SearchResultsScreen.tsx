@@ -89,7 +89,14 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
   return (
     <View style={{ paddingHorizontal: 16, gap: 16, flex: 1 }}>
       <Pressable
-        style={[{ backgroundColor: theme.colors.elevation.level5 }, styles.searchBar]}
+        style={[
+          {
+            backgroundColor: theme.dark
+              ? theme.colors.elevation.level5
+              : theme.colors.primaryContainer,
+          },
+          styles.searchBar,
+        ]}
         onPress={() => {
           navigation.goBack();
         }}
@@ -124,7 +131,9 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
                   flexDirection: "row",
                   flexWrap: "wrap",
                   justifyContent: "space-between",
-                  backgroundColor: theme.colors.primaryContainer,
+                  backgroundColor: theme.dark
+                    ? theme.colors.elevation.level5
+                    : theme.colors.primaryContainer,
                   borderRadius: 32,
                 }}
               >
@@ -144,7 +153,9 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
                           gap: 16,
                           flex: 1,
                         }}
-                        android_ripple={{ color: theme.colors.secondary }}
+                        android_ripple={{
+                          color: theme.colors.secondary,
+                        }}
                       >
                         <Image
                           source={{ uri: it.thumbnail }}
@@ -153,7 +164,13 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
                           resizeMode="cover"
                           style={{ borderRadius: 45 }}
                         />
-                        <Text variant="titleSmall" numberOfLines={1}>
+                        <Text
+                          style={{
+                            color: theme.colors.primary,
+                          }}
+                          variant="titleSmall"
+                          numberOfLines={1}
+                        >
                           {it.title}
                         </Text>
                       </Pressable>

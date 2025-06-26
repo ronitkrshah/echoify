@@ -26,7 +26,14 @@ export default function HomeScreen({ navigation }: TProps) {
     <Fragment>
       <View style={{ flex: 1, gap: 20 }}>
         <Pressable
-          style={[{ backgroundColor: theme.colors.primaryContainer }, styles.searchBar]}
+          style={[
+            {
+              backgroundColor: theme.dark
+                ? theme.colors.elevation.level5
+                : theme.colors.primaryContainer,
+            },
+            styles.searchBar,
+          ]}
           onPress={() => {
             navigation.push("SearchScreen");
           }}
