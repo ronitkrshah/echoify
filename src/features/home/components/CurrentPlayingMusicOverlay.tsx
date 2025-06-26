@@ -16,6 +16,7 @@ import { CompositeNavigationProp, useNavigation } from "@react-navigation/native
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { TStackNavigationRoutes } from "~/navigation";
 import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
+import { usePlayerController } from "~/core/playerController";
 
 type Navigation = CompositeNavigationProp<
   NativeBottomTabNavigationProp<TBottomTabRoutes, "HomeScreen">,
@@ -27,6 +28,7 @@ export default function CurrentPlayingMusicOverlay() {
   const playbackState = usePlaybackState();
   const theme = useTheme();
   const rotation = useSharedValue(0);
+  const playerController = usePlayerController();
 
   const navigation = useNavigation<Navigation>();
 
@@ -70,7 +72,7 @@ export default function CurrentPlayingMusicOverlay() {
         style={styles.container}
         android_ripple={{ color: "red" }}
         onPress={() => {
-          navigation.push("PlayerControllerScreen");
+          playerController.showModal();
         }}
       >
         <View>

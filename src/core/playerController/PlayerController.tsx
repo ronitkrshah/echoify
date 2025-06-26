@@ -1,18 +1,14 @@
 import Slider from "@react-native-community/slider";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import moment from "moment";
 import { useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import { IconButton, Surface, Text, useTheme } from "react-native-paper";
 import Animated from "react-native-reanimated";
 import TrackPlayer, { useActiveTrack, useIsPlaying, useProgress } from "react-native-track-player";
-import { TStackNavigationRoutes } from "~/navigation";
-import { SharedPlaylistModule } from "../playlist";
+import { SharedPlaylistModule } from "~/features/playlist";
 import { Music } from "~/models";
 
-type TProps = NativeStackScreenProps<TStackNavigationRoutes, "PlayerControllerScreen">;
-
-export default function PlayerControllerScreen({ route }: TProps) {
+export default function PlayerController() {
   const [showPlaylistAddDialog, setShowPlaylistAddDialog] = useState(false);
   const { duration, position } = useProgress(1000);
   const { bufferingDuringPlay, playing } = useIsPlaying();

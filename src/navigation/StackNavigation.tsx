@@ -4,7 +4,6 @@ import BottomTabsNavigation, { TBottomTabRoutes } from "./BottomTabNavigation";
 import { SearchResultsScreen, SearchScreen } from "~/features/search";
 import { useTheme } from "react-native-paper";
 import { PlaylistDetailsScreen, YoutubePlaylistDetailsScreen } from "~/features/playlist";
-import { PlayerControllerScreen } from "~/features/player";
 import { SplashScreen } from "~/features/splash";
 
 export type TStackNavigationRoutes = {
@@ -13,8 +12,6 @@ export type TStackNavigationRoutes = {
 
   PlaylistDetailsScreen: { playlistId: number };
   YoutubePlaylistDetailsScreen: { playlistId: string };
-
-  PlayerControllerScreen: undefined;
 
   SearchScreen: undefined;
   SearchResultsScreen: { query: string };
@@ -38,7 +35,6 @@ export default function StackNavigation() {
       <Stack.Screen name="SearchResultsScreen" component={SearchResultsScreen} />
       <Stack.Screen name="PlaylistDetailsScreen" component={PlaylistDetailsScreen} />
       <Stack.Screen name="YoutubePlaylistDetailsScreen" component={YoutubePlaylistDetailsScreen} />
-      <Stack.Screen name="PlayerControllerScreen" component={PlayerControllerScreen} />
     </Stack.Navigator>
   );
 }

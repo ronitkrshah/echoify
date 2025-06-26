@@ -13,6 +13,7 @@ import { VirtualMusicPlayerService } from "~/core/services";
 import { Database } from "~/database";
 import { PlaylistEntity, SongEntity } from "~/database/entities";
 import { MusicListItem } from "../__shared__/components";
+import { usePlayerController } from "~/core/playerController";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchResultsScreen">;
 
@@ -21,6 +22,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
 
   const loadingDialog = useLoadingDialog();
   const theme = useTheme();
+  const playerController = usePlayerController();
 
   useEffect(() => {
     InnertubeApi.searchMusicsAsync(route.params.query).then(setSearchResult);
@@ -31,7 +33,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
     if (activeTrack) {
       if (activeTrack.id === music.videoId) {
         // This track is already playing
-        navigation.push("PlayerControllerScreen");
+        playerController.showModal();
         return;
       }
     }
@@ -40,7 +42,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
       loadingDialog.show("Fetching Streams");
       VirtualMusicPlayerService.setQueueType("NORMAL");
       await VirtualMusicPlayerService.playMusicAsync(music);
-      navigation.push("PlayerControllerScreen");
+      playerController.showModal();
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     } finally {
@@ -69,7 +71,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
         relations: ["songs"], // important: load related songs
       });
 
-      if (!playlist) return
+      if (!playlist) return;
 
       // Step 3: Add the new song if it's not already in the playlist
       const alreadyExists = playlist.songs.some((song) => song.songId === addedSong.songId);
