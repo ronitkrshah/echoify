@@ -1,5 +1,5 @@
 import LocalStorage from "./LocalStorage";
-import { sleepThreadAsync } from "./ThreadSleep";
-import asyncFuncExecutor from "./AsyncFuncExecutor";
+import { sleepThreadAsync } from "./sleepThread";
+import asyncFuncExecutor from "./asyncFuncExecutor";
 
 export { LocalStorage, sleepThreadAsync, asyncFuncExecutor };
