@@ -1,6 +1,7 @@
 import moment from "moment";
 import { Image, Pressable, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
+import { musicDurationFormatter } from "~/core/utils";
 import { Music } from "~/models";
 
 type TProps = {
@@ -46,7 +47,7 @@ export default function MusicListItem({ music, onPress, onLongPress }: TProps) {
           </Text>
         </View>
         <Text variant="labelLarge" style={{ color: theme.colors.primary }}>
-          {moment.utc(music.duration * 1000).format("mm:ss")}
+          {musicDurationFormatter(music.duration)}
         </Text>
       </View>
     </Pressable>

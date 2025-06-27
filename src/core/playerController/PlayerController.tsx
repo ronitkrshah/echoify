@@ -7,6 +7,7 @@ import Animated from "react-native-reanimated";
 import TrackPlayer, { useActiveTrack, useIsPlaying, useProgress } from "react-native-track-player";
 import { SharedPlaylistModule } from "~/features/playlist";
 import { Music } from "~/models";
+import { musicDurationFormatter } from "../utils";
 
 export default function PlayerController() {
   const [showPlaylistAddDialog, setShowPlaylistAddDialog] = useState(false);
@@ -64,7 +65,7 @@ export default function PlayerController() {
         </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Text style={{ color: theme.dark ? theme.colors.onPrimary : theme.colors.primary }}>
-            {moment.utc(position * 1000).format("mm:ss")}
+            {musicDurationFormatter(position)}
           </Text>
           <Slider
             onSlidingComplete={(val) => {
@@ -78,10 +79,10 @@ export default function PlayerController() {
               theme.dark ? theme.colors.primaryContainer : theme.colors.tertiary
             }
             minimumTrackTintColor={theme.dark ? theme.colors.onPrimary : theme.colors.primary}
-            style={{ width: Dimensions.get("window").width * 0.6, height: 60 }}
+            style={{ flex: 1, height: 60 }}
           />
           <Text style={{ color: theme.dark ? theme.colors.onPrimary : theme.colors.primary }}>
-            {moment.utc(duration * 1000).format("mm:ss")}
+            {musicDurationFormatter(duration)}
           </Text>
         </View>
       </Surface>
