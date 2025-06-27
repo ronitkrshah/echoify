@@ -13,6 +13,7 @@ import {
   TrendingSongsList,
 } from "./components";
 import { Fragment } from "react";
+import Animated, { LinearTransition } from "react-native-reanimated";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "HomeScreen">,
@@ -52,7 +53,9 @@ export default function HomeScreen({ navigation }: TProps) {
           <Playlists query="Romantic Songs New" headerTitle="Romantic" />
         </ScrollView>
       </View>
-      <CurrentPlayingMusicOverlay />
+      <Animated.View layout={LinearTransition}>
+        <CurrentPlayingMusicOverlay />
+      </Animated.View>
     </Fragment>
   );
 }

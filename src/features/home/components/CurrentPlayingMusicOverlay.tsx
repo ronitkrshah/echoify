@@ -1,6 +1,8 @@
 import Animated, {
   cancelAnimation,
   Easing,
+  FadeInDown,
+  FadeOut,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -8,20 +10,10 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import TrackPlayer, { State, useActiveTrack, usePlaybackState } from "react-native-track-player";
-import { Image, Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { IconButton, Text, useTheme } from "react-native-paper";
 import { useEffect } from "react";
-import { NativeBottomTabNavigationProp } from "@bottom-tabs/react-navigation";
-import { CompositeNavigationProp, useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { TStackNavigationRoutes } from "~/navigation";
-import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { usePlayerController } from "~/core/playerController";
-
-type Navigation = CompositeNavigationProp<
-  NativeBottomTabNavigationProp<TBottomTabRoutes, "HomeScreen">,
-  NativeStackNavigationProp<TStackNavigationRoutes>
->;
 
 export default function CurrentPlayingMusicOverlay() {
   const activeTrack = useActiveTrack();
@@ -29,8 +21,6 @@ export default function CurrentPlayingMusicOverlay() {
   const theme = useTheme();
   const rotation = useSharedValue(0);
   const playerController = usePlayerController();
-
-  const navigation = useNavigation<Navigation>();
 
   useEffect(() => {
     if (playbackState.state === State.Playing) {
@@ -57,8 +47,12 @@ export default function CurrentPlayingMusicOverlay() {
     };
   });
 
+  if (!activeTrack) return null;
+
   return (
     <Animated.View
+      entering={FadeInDown.duration(400)}
+      exiting={FadeOut.duration(400)}
       style={[
         {
           backgroundColor: theme.colors.secondaryContainer,
@@ -77,7 +71,7 @@ export default function CurrentPlayingMusicOverlay() {
       >
         <View>
           <Animated.Image
-            source={{ uri: activeTrack?.artwork }}
+            source={{ uri: activeTrack.artwork }}
             height={60}
             width={60}
             resizeMode={"cover"}
@@ -86,13 +80,15 @@ export default function CurrentPlayingMusicOverlay() {
         </View>
         <View style={{ flex: 1, justifyContent: "center" }}>
           <Text variant="labelLarge" numberOfLines={2}>
-            {activeTrack?.title ?? "No Active Track"}
+            {activeTrack.title}
           </Text>
-          <Text variant="labelSmall" style={{ fontStyle: "italic" }}>
-            {activeTrack?.artist}
-          </Text>
+          {activeTrack.artist && (
+            <Text variant="labelSmall" style={{ fontStyle: "italic" }}>
+              {activeTrack.artist}
+            </Text>
+          )}
         </View>
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <IconButton
             icon={playbackState.state === State.Playing ? "pause" : "play"}
             onPress={() => {
@@ -110,6 +106,6 @@ const styles = StyleSheet.create({
   container: {
     padding: 8,
     flexDirection: "row",
-    gap: 16,
+    gap: 12,
   },
 });
