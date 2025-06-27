@@ -15,6 +15,7 @@ import { useLoadingDialog } from "~/core/components";
 import { VirtualMusicPlayerService } from "~/core/services";
 import { asyncFuncExecutor } from "~/core/utils";
 import TrackPlayer from "react-native-track-player";
+import { usePlayerController } from "~/core/playerController";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "RecentsScreen">,
@@ -28,6 +29,7 @@ export default function RecentScreen({ navigation }: TProps) {
   const theme = useTheme();
 
   const loadingDialog = useLoadingDialog();
+  const playerController = usePlayerController();
 
   async function handleMusicPressAsync(music: Music) {
     try {
@@ -37,7 +39,7 @@ export default function RecentScreen({ navigation }: TProps) {
         music,
         recentSongs.map((it) => Music.convertFromSongEntity(it))
       );
-      navigation.push("PlayerControllerScreen");
+      playerController.showModal();
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     } finally {
@@ -56,9 +58,10 @@ export default function RecentScreen({ navigation }: TProps) {
   }
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {});
-    setRecentSongs([]);
-    getRecentsDataAsync();
+    const unsubscribe = navigation.addListener("focus", () => {
+      setRecentSongs([]);
+      getRecentsDataAsync();
+    });
     return unsubscribe;
   }, []);
 

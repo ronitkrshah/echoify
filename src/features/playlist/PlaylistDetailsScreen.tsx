@@ -1,26 +1,17 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useRef, useState } from "react";
-import {
-  Button,
-  Dimensions,
-  FlatList,
-  StyleSheet,
-  TextInput,
-  ToastAndroid,
-  View,
-} from "react-native";
-import { Divider, IconButton, Menu, Text, useTheme } from "react-native-paper";
+import { Dimensions, FlatList, StyleSheet, TextInput, ToastAndroid, View } from "react-native";
+import { IconButton, Menu, Text, useTheme } from "react-native-paper";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useAlertDialog, useLoadingDialog } from "~/core/components";
-import { Database } from "~/database";
 import { PlaylistEntity } from "~/database/entities";
 import { TStackNavigationRoutes } from "~/navigation";
 import { LocalPlaylistRepository } from "~/repositories";
-import { asyncFuncExecutor, sleepThreadAsync } from "~/core/utils";
+import { sleepThreadAsync } from "~/core/utils";
 import { MusicListItem } from "../__shared__/components";
 import { Music } from "~/models";
 import { VirtualMusicPlayerService } from "~/core/services";
-import TrackPlayer from "react-native-track-player";
+import { usePlayerController } from "~/core/playerController";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "PlaylistDetailsScreen">;
 
@@ -33,6 +24,7 @@ export default function PlaylistDetailsScreen({ navigation, route }: TProps) {
 
   const loadingDialog = useLoadingDialog();
   const alertDialog = useAlertDialog();
+  const playerController = usePlayerController();
   const theme = useTheme();
 
   function deletePlaysist(id: number) {
@@ -55,7 +47,7 @@ export default function PlaylistDetailsScreen({ navigation, route }: TProps) {
         music,
         playlistInfo?.songs.map((it) => Music.convertFromSongEntity(it))
       );
-      navigation.push("PlayerControllerScreen");
+      playerController.showModal();
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     } finally {

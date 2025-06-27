@@ -7,18 +7,7 @@ import { SkeletonLoader, useLoadingDialog } from "~/core/components";
 import { MusicListItem } from "~/features/__shared__/components";
 import { Music } from "~/models";
 import { VirtualMusicPlayerService } from "~/core/services";
-import { asyncFuncExecutor } from "~/core/utils";
-import { NativeBottomTabNavigationProp } from "@bottom-tabs/react-navigation";
-import { CompositeNavigationProp, useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import TrackPlayer from "react-native-track-player";
-import { TStackNavigationRoutes } from "~/navigation";
-import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
-
-type Navigation = CompositeNavigationProp<
-  NativeBottomTabNavigationProp<TBottomTabRoutes, "HomeScreen">,
-  NativeStackNavigationProp<TStackNavigationRoutes>
->;
+import { usePlayerController } from "~/core/playerController";
 
 export default function TrendingSongsList() {
   const newSongs = useQuery({
@@ -26,7 +15,7 @@ export default function TrendingSongsList() {
     queryFn: () => InnertubeApi.searchMusicsAsync("New Hindi Songs"),
   });
   const loadingDialog = useLoadingDialog();
-  const navigation = useNavigation<Navigation>();
+  const playerController = usePlayerController();
 
   function chunkArray(arr: Music[], size: number) {
     return Array.from({ length: Math.ceil(arr.length / size) }, (_, index) =>
@@ -39,7 +28,7 @@ export default function TrendingSongsList() {
       loadingDialog.show("Fetching Streams");
       VirtualMusicPlayerService.setQueueType("PLAYLIST");
       await VirtualMusicPlayerService.playMusicAsync(music, newSongs.data);
-      navigation.push("PlayerControllerScreen");
+      playerController.showModal();
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     } finally {

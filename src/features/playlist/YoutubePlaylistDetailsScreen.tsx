@@ -1,25 +1,15 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import moment from "moment";
-import { Fragment, useEffect, useState } from "react";
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  Pressable,
-  StyleSheet,
-  ToastAndroid,
-  View,
-} from "react-native";
-import { Appbar, Text, useTheme } from "react-native-paper";
+import { useEffect, useState } from "react";
+import { Dimensions, FlatList, StyleSheet, ToastAndroid, View } from "react-native";
+import { Text, useTheme } from "react-native-paper";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import TrackPlayer from "react-native-track-player";
 import { InnertubeApi } from "~/api";
 import { useLoadingDialog } from "~/core/components";
 import { Music } from "~/models";
 import { TStackNavigationRoutes } from "~/navigation";
 import { VirtualMusicPlayerService } from "~/core/services";
-import { asyncFuncExecutor } from "~/core/utils";
 import { MusicListItem } from "../__shared__/components";
+import { usePlayerController } from "~/core/playerController";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "YoutubePlaylistDetailsScreen">;
 
@@ -28,13 +18,14 @@ export default function YoutubePlaylistDetailsScreen({ navigation, route }: TPro
     useState<Awaited<ReturnType<typeof InnertubeApi.getPlaylistDetialsAsync>>>();
   const theme = useTheme();
   const loadingDialog = useLoadingDialog();
+  const playerController = usePlayerController();
 
   async function handleMusicPressAsync(music: Music) {
     try {
       loadingDialog.show("Fetching Streams");
       VirtualMusicPlayerService.setQueueType("PLAYLIST");
       await VirtualMusicPlayerService.playMusicAsync(music, playlistDetails?.videos);
-      navigation.push("PlayerControllerScreen");
+      playerController.showModal();
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     } finally {

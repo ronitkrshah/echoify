@@ -1,24 +1,13 @@
-import { NativeBottomTabNavigationProp } from "@bottom-tabs/react-navigation";
-import { CompositeNavigationProp, useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
 import { ScrollView, ToastAndroid, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
-import TrackPlayer from "react-native-track-player";
 import { SkeletonLoader, useLoadingDialog } from "~/core/components";
+import { usePlayerController } from "~/core/playerController";
 import { VirtualMusicPlayerService } from "~/core/services";
-import { asyncFuncExecutor } from "~/core/utils";
 import { MusicListItem } from "~/features/__shared__/components";
 import { Music } from "~/models";
-import { TStackNavigationRoutes } from "~/navigation";
-import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import RecentsRepository from "~/repositories/RecentsRepository";
-
-type Navigation = CompositeNavigationProp<
-  NativeBottomTabNavigationProp<TBottomTabRoutes, "HomeScreen">,
-  NativeStackNavigationProp<TStackNavigationRoutes>
->;
 
 export default function RecentSongsList() {
   const recentMusics = useQuery({
@@ -28,8 +17,8 @@ export default function RecentSongsList() {
     },
   });
   const theme = useTheme();
-  const navigation = useNavigation<Navigation>();
   const loadingDialog = useLoadingDialog();
+  const playerController = usePlayerController();
 
   async function handleMusicPressAsync(music: Music) {
     try {
@@ -40,7 +29,7 @@ export default function RecentSongsList() {
         music,
         firstFewRecents!.map((it) => Music.convertFromSongEntity(it))
       );
-      navigation.push("PlayerControllerScreen");
+      playerController.showModal();
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     } finally {
