@@ -5,6 +5,7 @@ import TrackPlayer, {
   RatingType,
 } from "react-native-track-player";
 import VirtualMusicPlayerService from "./VirtualMusicPlayerService";
+import { ToastAndroid } from "react-native";
 
 class MusicPlayerService {
   private _isInitialized = false;
@@ -22,6 +23,9 @@ class MusicPlayerService {
     TrackPlayer.addEventListener(Event.PlaybackActiveTrackChanged, (e) =>
       VirtualMusicPlayerService.handlePlayBackActiveTrackChangeEventAsync(e)
     );
+    TrackPlayer.addEventListener(Event.PlaybackError, (e) => {
+      ToastAndroid.show(e.message, ToastAndroid.SHORT);
+    });
   }
 
   public async setupTrackPlayer() {
