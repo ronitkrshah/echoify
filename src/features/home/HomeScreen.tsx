@@ -3,8 +3,8 @@ import { NativeBottomTabScreenProps } from "@bottom-tabs/react-navigation";
 import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { TStackNavigationRoutes } from "~/navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Dimensions, Pressable, ScrollView, StyleSheet, View } from "react-native";
-import { FAB, Text, useTheme } from "react-native-paper";
+import { Dimensions, Pressable, ScrollView, StyleSheet, ToastAndroid, View } from "react-native";
+import { Text, useTheme } from "react-native-paper";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import {
   CurrentPlayingMusicOverlay,
@@ -12,8 +12,10 @@ import {
   RecentSongsList,
   TrendingSongsList,
 } from "./components";
-import { Fragment } from "react";
-import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
+import { useEffect } from "react";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { AppUpdateService } from "~/core/services";
+import { useAlertDialog } from "~/core/components";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "HomeScreen">,
@@ -24,6 +26,26 @@ const _screenWidth = Dimensions.get("screen").width;
 
 export default function HomeScreen({ navigation }: TProps) {
   const theme = useTheme();
+  const alertDialog = useAlertDialog();
+
+  useEffect(() => {
+    AppUpdateService.getUpdateAsync().then((data) => {
+      if (!data) return;
+      if (AppUpdateService.isUpdateAvailable(data[0].tag_name)) {
+        alertDialog.show({
+          title: "Echoify Just Got Better",
+          description: "We’ve made some exciting changes. Tap below to grab it.",
+          confirmText: "DOWNLOAD",
+          onConfirm() {
+            ToastAndroid.show("Downloading Update", ToastAndroid.SHORT);
+            AppUpdateService.downloadUpdateAndInstallPackageAsync(data[0].assets).catch((e) => {
+              ToastAndroid.show((e as Error).message, ToastAndroid.SHORT);
+            });
+          },
+        });
+      }
+    });
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>

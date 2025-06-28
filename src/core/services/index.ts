@@ -1,4 +1,5 @@
 import MusicPlayerService from "./MusicPlayerService";
 import VirtualMusicPlayerService from "./VirtualMusicPlayerService";
+import AppUpdateService from "./AppUpdateService";
 
-export { MusicPlayerService, VirtualMusicPlayerService };
+export { MusicPlayerService, VirtualMusicPlayerService, AppUpdateService };
