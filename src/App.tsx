@@ -6,8 +6,6 @@ import { AlertDialogProvider, LoadingDialogProvider } from "./core/components";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PlayerControllerProvider } from "./core/playerController";
-import { useEffect } from "react";
-import { Appearance, StatusBar } from "react-native";
 
 const queryClient = new QueryClient();
 

@@ -1,4 +1,4 @@
-package io.github.ronitkrshah.echoify
+package io.github.ronitkrshah.echoify.dev
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

@@ -1,4 +1,4 @@
-package io.github.ronitkrshah.echoify
+package io.github.ronitkrshah.echoify.dev
 
 import android.app.Application
 import android.content.res.Configuration

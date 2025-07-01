@@ -28,7 +28,7 @@
       },
 
       "edgeToEdgeEnabled": true,
-      "package": "io.github.ronitkrshah.echoify"
+      "package": "io.github.ronitkrshah.echoify.dev"
     },
     "plugins": [
       [
