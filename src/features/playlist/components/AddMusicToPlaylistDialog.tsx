@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dimensions, Pressable, ScrollView, View } from "react-native";
+import { Dimensions, Pressable, ScrollView, ToastAndroid, View } from "react-native";
 import { Dialog, IconButton, Portal, Text, useTheme } from "react-native-paper";
 import { Database } from "~/database";
 import { PlaylistEntity } from "~/database/entities";
@@ -53,9 +53,10 @@ export default function AddMusicToPlaylistDialog({ music, visible, onDimiss }: T
                     </View>
                     <IconButton
                       icon={"plus"}
-                      onPress={() => {
-                        LocalPlaylistRepository.addMusicToPlaylistAsync(it.id, music);
+                      onPress={async () => {
                         onDimiss?.();
+                        await LocalPlaylistRepository.addMusicToPlaylistAsync(it.id, music)
+                        ToastAndroid.show("Song Added", ToastAndroid.SHORT)
                       }}
                     />
                   </View>
