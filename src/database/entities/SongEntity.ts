@@ -5,11 +5,13 @@ import {
   ManyToOne,
   ManyToMany,
   CreateDateColumn,
+  Unique,
 } from "typeorm/browser";
 import PlaylistEntity from "./PlaylistEntity";
 import RecentsEntity from "./RecentsEntity";
 
 @Entity("song")
+@Unique(["songId"])
 export default class SongEntity {
   @PrimaryGeneratedColumn()
   public id!: number;
@@ -31,6 +33,9 @@ export default class SongEntity {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @Column({ type: "datetime", nullable: true })
+  public lastPlayed!: Date | null;
 
   @ManyToMany(() => PlaylistEntity, (playlist) => playlist.songs)
   public playlist!: PlaylistEntity;
