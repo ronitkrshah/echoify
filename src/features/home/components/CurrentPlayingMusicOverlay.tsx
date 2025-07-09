@@ -35,6 +35,9 @@ export default function CurrentPlayingMusicOverlay() {
       if (overlayYSharedValue.value > 20) {
         VirtualMusicPlayerService.resetAsync();
       } else {
+        if (overlayYSharedValue.value < -70) {
+          playerController.showModal();
+        }
         overlayYSharedValue.value = withSpring(0);
       }
     })
