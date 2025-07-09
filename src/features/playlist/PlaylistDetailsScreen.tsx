@@ -33,7 +33,9 @@ export default function PlaylistDetailsScreen({ navigation, route }: TProps) {
       description: `Are you sure to delete playlist ${playlistInfo?.name}?`,
       confirmText: "YES I'M SURE",
       async onConfirm() {
-        LocalPlaylistRepository.deletePlaylistAsync(route.params.playlistId);
+        loadingDialog.show()
+        await LocalPlaylistRepository.deletePlaylistAsync(route.params.playlistId);
+        loadingDialog.dismiss()
         navigation.goBack();
       },
     });
