@@ -21,9 +21,6 @@ class VirtualMusicPlayerService {
   private _playedSongs = new Set<string>();
 
   private _queueType: "PLAYLIST" | "NORMAL" = "NORMAL";
-
-  // Hot reloading might add multiple event listeners
-  private _isInitialized = false;
   private _isEventProcessing = false;
 
   get queue() {
