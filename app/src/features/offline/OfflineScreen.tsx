@@ -1,5 +1,5 @@
 import * as Media from "expo-media-library";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FlatList, ToastAndroid, View } from "react-native";
 import { Music } from "~/models";
 import * as Device from "expo-device";
@@ -14,12 +14,23 @@ import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { VirtualMusicPlayerService } from "~/core/services";
 import { usePlayerController } from "~/core/playerController";
-import { HoldOptionsDialog } from "./components";
+import * as Sharing from "expo-sharing";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "OfflineSongsScreen">,
   NativeStackScreenProps<TStackNavigationRoutes>
 >;
+
+const _holdOptions = [
+  {
+    title: "Share",
+    icon: "share-variant",
+    async onPress(music: Music) {
+      if (!(await Sharing.isAvailableAsync())) return;
+      Sharing.shareAsync(music.streamingLink!);
+    },
+  },
+];
 
 export default function OfflineScreen({ navigation }: TProps) {
   const [storedMusics, setStoredMusics] = useState<Music[]>([]);
@@ -93,25 +104,14 @@ export default function OfflineScreen({ navigation }: TProps) {
             style={{ borderRadius: 32, overflow: "hidden" }}
             entering={FadeInDown.delay(index * 100)}
           >
-            <MusicItem onPress={handleMusicPressAsync} music={item} />
+            <MusicListItem
+              holdOptions={_holdOptions}
+              onPress={handleMusicPressAsync}
+              music={item}
+            />
           </Animated.View>
         )}
       />
     </SafeAreaView>
-  );
-}
-
-function MusicItem({ music, onPress }: { music: Music; onPress?(music: Music): void }) {
-  const [showDialog, setShowDialog] = useState(false);
-
-  return (
-    <Fragment>
-      <MusicListItem onPress={onPress} music={music} onLongPress={() => setShowDialog(true)} />
-      <HoldOptionsDialog
-        music={music}
-        visible={showDialog}
-        onDismiss={() => setShowDialog(false)}
-      />
-    </Fragment>
   );
 }

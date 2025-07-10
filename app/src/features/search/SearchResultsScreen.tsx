@@ -204,11 +204,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
               style={{ borderRadius: 32, overflow: "hidden" }}
               entering={FadeInDown.delay(index * 100)}
             >
-              <MusicListItem
-                music={item}
-                onPress={handleSongClickAsync}
-                onLongPress={handleSongAddToPlaylist}
-              />
+              <MusicListItem music={item} onPress={handleSongClickAsync} />
             </Animated.View>
           );
         }}
