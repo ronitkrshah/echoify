@@ -127,6 +127,9 @@ class VirtualMusicPlayerService {
   }
 
   public async getRNTPTrackFromMusicAsync(music: Music) {
+    if (music?.streamingLink) {
+      return Music.convertMusicToRNTPTrack(music, music.streamingLink);
+    }
     const [url, error] = await asyncFuncExecutor(() =>
       InnertubeApi.getStreamingInfoAsync(music.videoId)
     );

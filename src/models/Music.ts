@@ -7,7 +7,8 @@ export default class Music {
     public readonly title: string,
     public readonly author: string,
     public readonly duration: number,
-    public readonly thumbnail: string
+    public readonly thumbnail: string,
+    public readonly streamingLink: string | undefined = undefined
   ) {}
 
   public static convertMusicToRNTPTrack(

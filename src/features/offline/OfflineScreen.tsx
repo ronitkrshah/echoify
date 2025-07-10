@@ -12,6 +12,8 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { TStackNavigationRoutes } from "~/navigation";
 import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { VirtualMusicPlayerService } from "~/core/services";
+import { usePlayerController } from "~/core/playerController";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "OfflineSongsScreen">,
@@ -22,6 +24,7 @@ export default function OfflineScreen({ navigation }: TProps) {
   const [storedMusics, setStoredMusics] = useState<Music[]>([]);
 
   const theme = useTheme();
+  const playerController = usePlayerController();
 
   async function askForPermissionAsync() {
     const status = await Media.requestPermissionsAsync(false, ["audio"]);
@@ -38,9 +41,26 @@ export default function OfflineScreen({ navigation }: TProps) {
 
     const t = musics.assets.map(
       (it) =>
-        new Music(it.id, it.filename, Device.deviceName ?? "System", it.duration, "ic_launcher")
+        new Music(
+          it.id,
+          it.filename,
+          Device.deviceName ?? "System",
+          it.duration,
+          "ic_launcher",
+          it.uri
+        )
     );
     setStoredMusics(t);
+  }
+
+  async function handleMusicPressAsync(music: Music) {
+    try {
+      VirtualMusicPlayerService.setQueueType("PLAYLIST");
+      await VirtualMusicPlayerService.playMusicAsync(music, storedMusics);
+      playerController.showModal();
+    } catch (error) {
+      ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
+    }
   }
 
   async function bootStrapAsync() {
@@ -72,10 +92,7 @@ export default function OfflineScreen({ navigation }: TProps) {
             style={{ borderRadius: 32, overflow: "hidden" }}
             entering={FadeInDown.delay(index * 100)}
           >
-            <MusicListItem
-              // onPress={handleMusicPressAsync}
-              music={item}
-            />
+            <MusicListItem onPress={handleMusicPressAsync} music={item} />
           </Animated.View>
         )}
       />
