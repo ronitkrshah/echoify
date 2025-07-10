@@ -40,6 +40,7 @@ import Innertube, { UniversalCache } from "youtubei.js";
 let innertube: Promise<Innertube> = Innertube.create({
   cache: new UniversalCache(false),
   generate_session_locally: true,
+  retrieve_player: false,
 });
 
 export default innertube;

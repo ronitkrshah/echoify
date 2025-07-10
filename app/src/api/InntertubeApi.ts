@@ -5,6 +5,7 @@ import { PlaylistVideo, Video } from "node_modules/youtubei.js/dist/src/parser/n
 
 class InnertubeApi {
   private _innertube!: Innertube;
+  private _backendApi = process.env.EXPO_PUBLIC_API_URL;
 
   public async setupInnertube() {
     if (!this._innertube) {
@@ -26,8 +27,8 @@ class InnertubeApi {
             video.title.text ?? "Unknown",
             video.author.name,
             video.duration.seconds,
-            video.best_thumbnail?.url ?? "",
-          ),
+            video.best_thumbnail?.url ?? ""
+          )
         );
       } catch (error) {}
     }
@@ -45,8 +46,8 @@ class InnertubeApi {
         new Playlist(
           playlist?.content_id,
           playlist?.metadata.title?.text,
-          playlist?.content_image?.primary_thumbnail?.image[0]?.url,
-        ),
+          playlist?.content_image?.primary_thumbnail?.image[0]?.url
+        )
       );
     });
 
@@ -54,8 +55,12 @@ class InnertubeApi {
   }
 
   public async getStreamingInfoAsync(videoId: string) {
-    const data = await this._innertube.getStreamingData(videoId, { quality: "best" });
-    return data.url;
+    const response = await fetch(`${this._backendApi}/api/v1/music/stream/${videoId}`);
+    const data = await response.json();
+    if (data.status) {
+      return data.url;
+    }
+    return data.message;
   }
 
   public async getNextMusicAsync(videoId: string, index = 0) {
@@ -69,7 +74,7 @@ class InnertubeApi {
         video.title.text ?? "Unknown",
         video.author.name,
         video.duration.seconds,
-        video.best_thumbnail?.url ?? "",
+        video.best_thumbnail?.url ?? ""
       );
     }
   }
@@ -98,8 +103,8 @@ class InnertubeApi {
           video.title.text ?? "Unknown",
           video.author.name,
           video.duration.seconds,
-          video.thumbnails[0].url,
-        ),
+          video.thumbnails[0].url
+        )
       );
     });
 
