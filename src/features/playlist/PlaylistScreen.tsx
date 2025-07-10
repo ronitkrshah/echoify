@@ -10,6 +10,7 @@ import { CompositeScreenProps } from "@react-navigation/native";
 import { NativeBottomTabScreenProps } from "@bottom-tabs/react-navigation";
 import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { LocalPlaylistRepository } from "~/repositories";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "PlaylistsScreen">,
@@ -18,22 +19,24 @@ type TProps = CompositeScreenProps<
 
 export default function PlaylistScreen({ navigation }: TProps) {
   const [showPlaylistCreateDialog, setShowPlaylistCreateDialog] = useState(false);
-  const [playlists, setPlaylists] = useState<Awaited<ReturnType<typeof LocalPlaylistRepository.getAllPlaylistAsync>>>([]);
+  const [playlists, setPlaylists] = useState<
+    Awaited<ReturnType<typeof LocalPlaylistRepository.getAllPlaylistAsync>>
+  >([]);
 
-  const theme = useTheme();  
+  const theme = useTheme();
 
   useEffect(() => {
     return navigation.addListener("focus", () => {
-      LocalPlaylistRepository.getAllPlaylistAsync().then(setPlaylists)
+      LocalPlaylistRepository.getAllPlaylistAsync().then(setPlaylists);
     });
   }, []);
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, paddingHorizontal: 16 }}>
         <View style={{ flex: 1 }}>
           <Animated.FlatList
-          layout={LinearTransition}
+            layout={LinearTransition}
             ListEmptyComponent={() => (
               <View
                 style={{
@@ -42,7 +45,11 @@ export default function PlaylistScreen({ navigation }: TProps) {
                   alignItems: "center",
                 }}
               >
-                <MaterialDesignIcons color={theme.colors.onBackground} name="playlist-plus" size={60} />
+                <MaterialDesignIcons
+                  color={theme.colors.onBackground}
+                  name="playlist-plus"
+                  size={60}
+                />
                 <Text variant="titleLarge">You Don't Have Any Playlists</Text>
               </View>
             )}
@@ -56,7 +63,7 @@ export default function PlaylistScreen({ navigation }: TProps) {
             renderItem={({ item, index }) => {
               return (
                 <Animated.View
-                entering={FadeInDown.delay(index * 100).duration(500)}
+                  entering={FadeInDown.delay(index * 100).duration(500)}
                   style={{
                     width: Dimensions.get("screen").width * 0.4,
                     height: 150,
@@ -77,7 +84,11 @@ export default function PlaylistScreen({ navigation }: TProps) {
                       justifyContent: "center",
                     }}
                   >
-                    <MaterialDesignIcons color={theme.colors.onBackground} name="playlist-music" size={70} />
+                    <MaterialDesignIcons
+                      color={theme.colors.onBackground}
+                      name="playlist-music"
+                      size={70}
+                    />
                     <Text variant="titleMedium" numberOfLines={2} style={{ textAlign: "center" }}>
                       {item.name}
                     </Text>
@@ -100,10 +111,10 @@ export default function PlaylistScreen({ navigation }: TProps) {
         onDismiss={() => setShowPlaylistCreateDialog(false)}
         onPlaylistCreate={() => {
           setShowPlaylistCreateDialog(false);
-          LocalPlaylistRepository.getAllPlaylistAsync().then(setPlaylists)
+          LocalPlaylistRepository.getAllPlaylistAsync().then(setPlaylists);
         }}
       />
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 

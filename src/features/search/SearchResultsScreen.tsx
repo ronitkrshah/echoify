@@ -14,6 +14,7 @@ import { Database } from "~/database";
 import { PlaylistEntity, SongEntity } from "~/database/entities";
 import { MusicListItem } from "../__shared__/components";
 import { usePlayerController } from "~/core/playerController";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchResultsScreen">;
 
@@ -87,7 +88,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
   }
 
   return (
-    <View style={{ paddingHorizontal: 16, gap: 16, flex: 1 }}>
+    <SafeAreaView style={{ paddingHorizontal: 16, gap: 16, flex: 1 }}>
       <Pressable
         style={[
           {
@@ -212,7 +213,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
           );
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

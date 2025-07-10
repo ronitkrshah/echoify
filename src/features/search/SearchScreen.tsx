@@ -11,6 +11,7 @@ import Animated, { LinearTransition } from "react-native-reanimated";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { TStackNavigationRoutes } from "~/navigation";
 import { InnertubeApi } from "~/api";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchScreen">;
 
@@ -83,7 +84,7 @@ export default function SearchScreen({ navigation }: TProps) {
   }, [debouncedQuery]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Searchbar
         value={query}
         onChangeText={setQuery}
@@ -133,7 +134,12 @@ export default function SearchScreen({ navigation }: TProps) {
                     flexShrink: 1,
                   }}
                 >
-                  <MaterialDesignIcons color={theme.colors.onBackground} name="magnify" size={20} style={{ marginRight: 6 }} />
+                  <MaterialDesignIcons
+                    color={theme.colors.onBackground}
+                    name="magnify"
+                    size={20}
+                    style={{ marginRight: 6 }}
+                  />
                   <Text
                     variant="titleMedium"
                     numberOfLines={2}
@@ -156,7 +162,7 @@ export default function SearchScreen({ navigation }: TProps) {
           );
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

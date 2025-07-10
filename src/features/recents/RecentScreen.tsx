@@ -16,6 +16,7 @@ import { VirtualMusicPlayerService } from "~/core/services";
 import { asyncFuncExecutor } from "~/core/utils";
 import TrackPlayer from "react-native-track-player";
 import { usePlayerController } from "~/core/playerController";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "RecentsScreen">,
@@ -66,7 +67,7 @@ export default function RecentScreen({ navigation }: TProps) {
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={{ padding: 16 }}>
         <Text variant="titleLarge" style={{ fontWeight: "bold", color: theme.colors.primary }}>
           Recents
@@ -90,6 +91,6 @@ export default function RecentScreen({ navigation }: TProps) {
           </Animated.View>
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }

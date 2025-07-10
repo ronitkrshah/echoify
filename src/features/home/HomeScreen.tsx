@@ -16,6 +16,7 @@ import { useEffect } from "react";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { AppUpdateService } from "~/core/services";
 import { useAlertDialog } from "~/core/components";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "HomeScreen">,
@@ -48,7 +49,7 @@ export default function HomeScreen({ navigation }: TProps) {
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, gap: 20 }}>
         <Pressable
           style={[
@@ -88,7 +89,7 @@ export default function HomeScreen({ navigation }: TProps) {
       >
         <CurrentPlayingMusicOverlay />
       </Animated.View>
-    </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({

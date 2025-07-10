@@ -11,6 +11,7 @@ import { CompositeScreenProps } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { TStackNavigationRoutes } from "~/navigation";
 import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "OfflineSongsScreen">,
@@ -54,7 +55,7 @@ export default function OfflineScreen({ navigation }: TProps) {
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={{ padding: 16 }}>
         <Text variant="titleLarge" style={{ fontWeight: "bold", color: theme.colors.primary }}>
           Recents
@@ -78,6 +79,6 @@ export default function OfflineScreen({ navigation }: TProps) {
           </Animated.View>
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }

@@ -8,6 +8,7 @@ import MaterialDesignIcons from "@react-native-vector-icons/material-design-icon
 import { ActivityIndicator, Text, useTheme } from "react-native-paper";
 import { useEffect } from "react";
 import { sleepThreadAsync } from "~/core/utils";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SplashScreen">;
 
@@ -36,7 +37,7 @@ export default function SplashScreen({ navigation }: TProps) {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <MaterialDesignIcons
         name="music-note-eighth"
         size={screenWidth * 0.6}
@@ -46,7 +47,7 @@ export default function SplashScreen({ navigation }: TProps) {
         Echoify Music
       </Text>
       <ActivityIndicator />
-    </View>
+    </SafeAreaView>
   );
 }
 

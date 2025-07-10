@@ -18,9 +18,7 @@ export default function App() {
             <PlayerControllerProvider>
               <LoadingDialogProvider>
                 <AlertDialogProvider>
-                  <SafeAreaView style={{ flex: 1 }}>
                     <AppNavigation />
-                  </SafeAreaView>
                 </AlertDialogProvider>
               </LoadingDialogProvider>
             </PlayerControllerProvider>

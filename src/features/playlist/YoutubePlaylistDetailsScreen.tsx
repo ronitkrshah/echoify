@@ -10,6 +10,7 @@ import { TStackNavigationRoutes } from "~/navigation";
 import { VirtualMusicPlayerService } from "~/core/services";
 import { MusicListItem } from "../__shared__/components";
 import { usePlayerController } from "~/core/playerController";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "YoutubePlaylistDetailsScreen">;
 
@@ -38,7 +39,7 @@ export default function YoutubePlaylistDetailsScreen({ navigation, route }: TPro
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <FlatList
         ListHeaderComponent={() => (
           <View style={[styles.rootContainer, { backgroundColor: theme.colors.primaryContainer }]}>
@@ -68,7 +69,7 @@ export default function YoutubePlaylistDetailsScreen({ navigation, route }: TPro
           );
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

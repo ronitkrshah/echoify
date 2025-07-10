@@ -12,6 +12,7 @@ import { MusicListItem } from "../__shared__/components";
 import { Music } from "~/models";
 import { VirtualMusicPlayerService } from "~/core/services";
 import { usePlayerController } from "~/core/playerController";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "PlaylistDetailsScreen">;
 
@@ -62,7 +63,7 @@ export default function PlaylistDetailsScreen({ navigation, route }: TProps) {
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={[styles.rootContainer, { backgroundColor: theme.colors.primaryContainer }]}>
         <View style={styles.playlistDetails}>
           <View style={{ flex: 1 }}>
@@ -142,7 +143,7 @@ export default function PlaylistDetailsScreen({ navigation, route }: TProps) {
           );
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
