@@ -1,5 +1,5 @@
 import * as Media from "expo-media-library";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { FlatList, ToastAndroid, View } from "react-native";
 import { Music } from "~/models";
 import * as Device from "expo-device";
@@ -14,6 +14,7 @@ import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { VirtualMusicPlayerService } from "~/core/services";
 import { usePlayerController } from "~/core/playerController";
+import { HoldOptionsDialog } from "./components";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "OfflineSongsScreen">,
@@ -92,10 +93,25 @@ export default function OfflineScreen({ navigation }: TProps) {
             style={{ borderRadius: 32, overflow: "hidden" }}
             entering={FadeInDown.delay(index * 100)}
           >
-            <MusicListItem onPress={handleMusicPressAsync} music={item} />
+            <MusicItem onPress={handleMusicPressAsync} music={item} />
           </Animated.View>
         )}
       />
     </SafeAreaView>
+  );
+}
+
+function MusicItem({ music, onPress }: { music: Music; onPress?(music: Music): void }) {
+  const [showDialog, setShowDialog] = useState(false);
+
+  return (
+    <Fragment>
+      <MusicListItem onPress={onPress} music={music} onLongPress={() => setShowDialog(true)} />
+      <HoldOptionsDialog
+        music={music}
+        visible={showDialog}
+        onDismiss={() => setShowDialog(false)}
+      />
+    </Fragment>
   );
 }
