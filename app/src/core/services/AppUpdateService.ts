@@ -1,6 +1,6 @@
 import * as Application from "expo-application";
+import * as FileSystem from "expo-file-system";
 import * as Device from "expo-device";
-import RNFS from "react-native-fs";
 import { install as InstallAPK } from "react-native-package-installer";
 
 type GitHubRelease = {
@@ -114,14 +114,17 @@ class AppUpdateService {
   public async downloadUpdateAndInstallPackageAsync(assets: GitHubRelease["assets"]) {
     const downloadLink = this.getDownloadLinkBasedOnArchietecture(assets);
 
-    await RNFS.downloadFile({
-      fromUrl: downloadLink,
-      toFile: RNFS.CachesDirectoryPath + "/latest.apk",
-    }).promise;
+    const downloadResumable = FileSystem.createDownloadResumable(
+      downloadLink,
+      FileSystem.cacheDirectory + "echoify_latest.apk"
+    );
 
-    const status = await InstallAPK(["file:///" + RNFS.CachesDirectoryPath + "/latest.apk"]);
-    if (status === false) {
-      throw new Error("Install Failed");
+    const result = await downloadResumable.downloadAsync();
+    if (result?.uri) {
+      const status = await InstallAPK([result.uri]);
+      if (status === false) {
+        throw new Error("Install Failed");
+      }
     }
   }
 
