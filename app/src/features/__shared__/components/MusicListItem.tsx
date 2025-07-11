@@ -5,6 +5,7 @@ import { Dialog, Portal, Text, useTheme } from "react-native-paper";
 import { musicDurationFormatter } from "~/core/utils";
 import { Music } from "~/models";
 import MaterialIcons from "@react-native-vector-icons/material-design-icons";
+import { DEFAULT_MUSIC_HOLD_OPTIONS } from "../constants";
 
 type TProps = {
   music: Music;
@@ -12,7 +13,11 @@ type TProps = {
   holdOptions?: { title: string; icon: string; onPress: (music: Music) => void }[];
 };
 
-export default function MusicListItem({ music, onPress, holdOptions = [] }: TProps) {
+export default function MusicListItem({
+  music,
+  onPress,
+  holdOptions = DEFAULT_MUSIC_HOLD_OPTIONS,
+}: TProps) {
   const [showOptions, setShowOptions] = useState(false);
   const theme = useTheme();
 
