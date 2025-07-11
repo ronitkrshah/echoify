@@ -4,7 +4,6 @@ import { useTheme } from "react-native-paper";
 import { HomeScreen } from "~/features/home";
 import { PlaylistScreen } from "~/features/playlist";
 import { RecentScreen } from "~/features/recents";
-import { DownloadScreen } from "~/features/download";
 import { OfflineScreen } from "~/features/offline";
 
 export type TBottomTabRoutes = {
@@ -19,7 +18,6 @@ const TrendingIcon = MaterialDesignIcons.getImageSourceSync("compass-outline", 2
 const RecentsIcon = MaterialDesignIcons.getImageSourceSync("history", 24)!;
 const PlaylistsIcon = MaterialDesignIcons.getImageSourceSync("playlist-music", 24)!;
 const OfflineSongsIcon = MaterialDesignIcons.getImageSourceSync("disc-player", 24)!;
-const DownloadsIcon = MaterialDesignIcons.getImageSourceSync("download", 24)!;
 
 const Tabs = createNativeBottomTabNavigator<TBottomTabRoutes>();
 
@@ -51,11 +49,6 @@ export default function BottomTabsNavigation() {
         name="OfflineSongsScreen"
         component={OfflineScreen}
         options={{ tabBarLabel: "Offline", tabBarIcon: () => OfflineSongsIcon }}
-      />
-      <Tabs.Screen
-        name="DownloadsScreen"
-        component={DownloadScreen}
-        options={{ tabBarLabel: "Downloads", tabBarIcon: () => DownloadsIcon }}
       />
     </Tabs.Navigator>
   );

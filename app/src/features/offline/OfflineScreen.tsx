@@ -90,13 +90,12 @@ export default function OfflineScreen({ navigation }: TProps) {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ padding: 16 }}>
         <Text variant="titleLarge" style={{ fontWeight: "bold", color: theme.colors.primary }}>
-          Recents
+          On Device
         </Text>
       </View>
       <FlatList
         data={storedMusics}
         onEndReachedThreshold={0.1}
-        // onEndReached={() => getRecentsDataAsync(recentSongs.length / _perPageData)}
         keyExtractor={(item) => item.videoId}
         contentContainerStyle={{ paddingHorizontal: 8, gap: 16 }}
         renderItem={({ item, index }) => (
