@@ -62,10 +62,6 @@ export default function OfflineScreen({ navigation }: TProps) {
           it.uri
         )
     );
-    try {
-    } catch (error) {
-      console.log(error);
-    }
 
     setStoredMusics(t);
   }
