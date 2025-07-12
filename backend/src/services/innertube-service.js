@@ -35,9 +35,22 @@ class InnertubeService {
         const data = await this.#_innertube.music.search(query, {
             type: "song",
         });
+
+        /** @type { YTNodes.MusicShelf | undefined} */
+        let musicShelf;
+
+        for (const item of data.contents) {
+            if (item.type === YTNodes.MusicShelf.name) {
+                musicShelf = item;
+                break;
+            }
+        }
+
+        if (!musicShelf) throw new Error("MusicShelf Isn't Available");
+
         const retVal = [];
 
-        for (const music of data.contents[0].contents) {
+        for (const music of musicShelf.contents) {
             try {
                 retVal.push({
                     id: music.id,
@@ -61,10 +74,21 @@ class InnertubeService {
             type: "playlist",
         });
 
+        /** @type { YTNodes.MusicShelf | undefined} */
+        let musicShelf;
+
+        for (const item of data.contents) {
+            if (item.type === YTNodes.MusicShelf.name) {
+                musicShelf = item;
+                break;
+            }
+        }
+
+        if (!musicShelf) throw new Error("MusicShelf Isn't Available");
+
         const retval = [];
 
-        for (const playlist of data.contents[0].as(YTNodes.MusicShelf)
-            .contents) {
+        for (const playlist of musicShelf.contents) {
             retval.push({
                 id: playlist.id,
                 name: playlist.title ?? "Unknown",
