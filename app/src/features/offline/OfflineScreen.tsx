@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { FlatList, ToastAndroid, View } from "react-native";
 import { Music } from "~/models";
 import * as Device from "expo-device";
-import { Text, useTheme } from "react-native-paper";
+import { Searchbar, Text, useTheme } from "react-native-paper";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { MusicListItem } from "../__shared__/components";
 import { NativeBottomTabScreenProps } from "@bottom-tabs/react-navigation";
@@ -15,6 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { VirtualMusicPlayerService } from "~/core/services";
 import { usePlayerController } from "~/core/playerController";
 import * as Sharing from "expo-sharing";
+import { useDebounce } from "~/hooks";
 
 type TProps = CompositeScreenProps<
   NativeBottomTabScreenProps<TBottomTabRoutes, "OfflineSongsScreen">,
@@ -34,6 +35,8 @@ const _holdOptions = [
 
 export default function OfflineScreen({ navigation }: TProps) {
   const [storedMusics, setStoredMusics] = useState<Music[]>([]);
+  const [seach, setSearch] = useState("");
+  const debouncedSearch = useDebounce(seach, 400);
 
   const theme = useTheme();
   const playerController = usePlayerController();
@@ -51,7 +54,7 @@ export default function OfflineScreen({ navigation }: TProps) {
   async function getLocalMusicsAsync() {
     const musics = await Media.getAssetsAsync({ mediaType: "audio", sortBy: "default" });
 
-    const t = musics.assets.map(
+    return musics.assets.map(
       (it) =>
         new Music(
           it.id,
@@ -62,8 +65,6 @@ export default function OfflineScreen({ navigation }: TProps) {
           it.uri
         )
     );
-
-    setStoredMusics(t);
   }
 
   async function handleMusicPressAsync(music: Music) {
@@ -79,7 +80,7 @@ export default function OfflineScreen({ navigation }: TProps) {
   async function bootStrapAsync() {
     const isPermissionGranted = await askForPermissionAsync();
     if (!isPermissionGranted) return;
-    getLocalMusicsAsync();
+    getLocalMusicsAsync().then(setStoredMusics);
   }
 
   useEffect(() => {
@@ -87,8 +88,30 @@ export default function OfflineScreen({ navigation }: TProps) {
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    if (debouncedSearch === "") {
+      bootStrapAsync();
+    } else {
+      getLocalMusicsAsync().then((data) => {
+        const filteredData = data.filter((it) =>
+          it.title
+            .toLowerCase()
+            .replaceAll(" ", "")
+            .includes(debouncedSearch.toLowerCase().replaceAll(" ", ""))
+        );
+        setStoredMusics(filteredData);
+      });
+    }
+  }, [debouncedSearch]);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <Searchbar
+        value={seach}
+        onChangeText={setSearch}
+        style={{ marginHorizontal: 16 }}
+        placeholder="Search Songs"
+      />
       <View style={{ padding: 16 }}>
         <Text variant="titleLarge" style={{ fontWeight: "bold", color: theme.colors.primary }}>
           On Device
