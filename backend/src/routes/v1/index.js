@@ -1,6 +1,3 @@
-const router = require('express').Router()
-const musicRouter = require("./music")
+const musicRouter = require("./music-routes");
 
-router.use("/music", musicRouter)
-
-module.exports = router
+module.exports = { musicRouter };

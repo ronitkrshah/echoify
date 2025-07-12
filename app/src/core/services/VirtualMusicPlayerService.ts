@@ -1,5 +1,4 @@
 import TrackPlayer, {
-  Event,
   PlaybackActiveTrackChangedEvent,
   State,
   Track,
@@ -65,25 +64,10 @@ class VirtualMusicPlayerService {
        */
       if (this._queueType === "PLAYLIST") return;
 
-      let nextMusic: Music | undefined;
-      /** Getting next Song */
-      for (let index = 0; index < 3; index++) {
-        const music = await InnertubeApi.getNextMusicAsync(currentTrackId, index);
-        if (!music) continue;
-        if (this._playedSongs.has(music.videoId)) continue;
-        nextMusic = music;
-        break;
-      }
-
-      if (!nextMusic) return;
-      const nextTrack = await this.getRNTPTrackFromMusicAsync(nextMusic);
-
-      /** Update Both queues */
-      if (nextTrack) {
-        this._queue.push(nextMusic);
-        this._playedSongs.add(nextMusic.videoId);
-        TrackPlayer.add(nextTrack);
-      }
+      const relatedMusics = await InnertubeApi.getRealtedMusic(currentTrackId);
+      this.addMusicsToQueue(relatedMusics);
+      const nextTrack = await this.getRNTPTrackFromMusicAsync(relatedMusics[0]);
+      TrackPlayer.add(nextTrack);
     } catch (error) {
       console.log(error);
     } finally {

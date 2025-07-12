@@ -1,114 +1,96 @@
-import Innertube from "youtubei.js";
-import innertube from "./lib/youtube";
 import { Music, Playlist } from "~/models";
-import { PlaylistVideo, Video } from "node_modules/youtubei.js/dist/src/parser/nodes";
+
+type TApiMusic = {
+  id: string;
+  title: string;
+  author: string;
+  duration: number;
+  thumbnail: string;
+};
+
+type TApiPlaylist = {
+  id: string;
+  name: string;
+  thumbnail: string;
+};
+
+type TPlaylistInfo = {
+  title: string;
+  totalVideos: string;
+  thumbnail: string;
+  videos: TApiMusic[];
+};
 
 class InnertubeApi {
-  private _innertube!: Innertube;
-  private _backendApi = process.env.EXPO_PUBLIC_API_URL;
+  private readonly _backendApi;
 
-  public async setupInnertube() {
-    if (!this._innertube) {
-      this._innertube = await innertube;
-    }
-    this._innertube;
+  public constructor() {
+    this._backendApi = `${process.env.EXPO_PUBLIC_API_URL}/api/v1`;
   }
 
   public async searchMusicsAsync(query: string) {
-    const data = await this._innertube.search(query, { type: "video" });
-    const retVal: Music[] = [];
+    const response = await fetch(`${this._backendApi}/songs?q=${query}`);
+    const data = await response.json();
 
-    for (const reslut of data.results) {
-      try {
-        const video = reslut.as(Video);
-        retVal.push(
-          new Music(
-            video.video_id,
-            video.title.text ?? "Unknown",
-            video.author.name,
-            video.duration.seconds,
-            video.best_thumbnail?.url ?? ""
-          )
-        );
-      } catch (error) {}
-    }
+    if (!data.status) throw new Error(data.message);
 
-    return retVal;
+    const songs = data.data as TApiMusic[];
+    return songs.map((it) => new Music(it.id, it.title, it.author, it.duration, it.thumbnail));
   }
 
   public async serachPlaylistsAsync(query: string) {
-    const data = await this._innertube.search(query, { type: "playlist" });
-
-    const retval: Playlist[] = [];
-    data.results.forEach((it) => {
-      const playlist = it as any;
-      retval.push(
-        new Playlist(
-          playlist?.content_id,
-          playlist?.metadata.title?.text,
-          playlist?.content_image?.primary_thumbnail?.image[0]?.url
-        )
-      );
-    });
-
-    return retval;
-  }
-
-  public async getStreamingInfoAsync(videoId: string) {
-    const response = await fetch(`${this._backendApi}/api/v1/music/stream/${videoId}`);
+    const response = await fetch(`${this._backendApi}/playlists?q=${query}`);
     const data = await response.json();
+
+    if (!data.status) throw new Error(data.message);
+
+    const playlists = data.data as TApiPlaylist[];
+    return playlists.map((it) => new Playlist(it.id, it.name, it.thumbnail));
+  }
+
+  public async getStreamingInfoAsync(videoId: string): Promise<string> {
+    const response = await fetch(`${this._backendApi}/stream/${videoId}`);
+    const data = await response.json();
+
     if (data.status) {
-      return data.url;
+      return data.data;
     }
-    return data.message;
+
+    throw new Error(data.message);
   }
 
-  public async getNextMusicAsync(videoId: string, index = 0) {
-    const videoInfo = await this._innertube.getInfo(videoId);
+  public async getRealtedMusic(videoId: string) {
+    const response = await fetch(`${this._backendApi}/relatedSongs/${videoId}`);
+    const data = await response.json();
 
-    if (videoInfo.watch_next_feed) {
-      const video = videoInfo.watch_next_feed[index] as Video;
+    if (!data.status) throw new Error(data.message);
 
-      return new Music(
-        video.video_id,
-        video.title.text ?? "Unknown",
-        video.author.name,
-        video.duration.seconds,
-        video.best_thumbnail?.url ?? ""
-      );
-    }
+    const songs = data.data as TApiMusic[];
+    return songs.map((it) => new Music(it.id, it.title, it.author, it.duration, it.thumbnail));
   }
 
-  public async getSearchSuggestionsAsync(query: string) {
-    const suggestions = await this._innertube.getSearchSuggestions(query);
-    return suggestions;
+  public async getSearchSuggestionsAsync(query: string): Promise<string[]> {
+    const response = await fetch(`${this._backendApi}/searchSuggestions?q=${query}`);
+    const data = await response.json();
+
+    if (data.status) {
+      return data.data;
+    }
+
+    throw new Error(data.message);
   }
 
   public async getPlaylistDetialsAsync(playlistId: string) {
-    const info = await this._innertube.getPlaylist(playlistId);
-
-    const basicInfo = {
-      title: info.info.title,
-      totalVideos: info.info.total_items,
-      thumnail: info.info.thumbnails[0],
-    };
+    const response = await fetch(`${this._backendApi}/playlists/${playlistId}`);
+    const data = (await response.json()).data as TPlaylistInfo;
 
     const videos: Music[] = [];
 
-    info.videos.forEach((it) => {
-      const video = it.as(PlaylistVideo);
-      videos.push(
-        new Music(
-          video.id,
-          video.title.text ?? "Unknown",
-          video.author.name,
-          video.duration.seconds,
-          video.thumbnails[0].url
-        )
-      );
+    data.videos.forEach((it) => {
+      videos.push(new Music(it.id, it.title, it.author, it.duration, it.thumbnail));
     });
 
-    return { ...basicInfo, videos };
+    return { title: data.title, totalVideos: data.totalVideos, thumbnail: data.thumbnail, videos };
   }
 }
 

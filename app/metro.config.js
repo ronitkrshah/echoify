@@ -3,10 +3,6 @@ const { wrapWithReanimatedMetroConfig } = require("react-native-reanimated/metro
 const { getDefaultConfig } = require("expo/metro-config");
 
 /** @type {import('expo/metro-config').MetroConfig} */
-const config = getDefaultConfig(__dirname, {
-  resolver: {
-    unstable_enablePackageExports: true,
-  },
-});
+const config = getDefaultConfig(__dirname);
 
 module.exports = wrapWithReanimatedMetroConfig(config);

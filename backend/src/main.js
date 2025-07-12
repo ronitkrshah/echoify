@@ -3,7 +3,7 @@ const express = require("express");
 const morgan = require("morgan");
 const Enviroment = require("./env");
 const appRouter = require("./routes");
-const { Innertube } = require("./lib");
+const { InnertubeService } = require("./services");
 
 const app = express();
 {
@@ -16,7 +16,7 @@ const app = express();
 }
 
 async function main() {
-    await Innertube.setupInnertube();
+    await InnertubeService.setupInnertube();
     app.listen(Enviroment.PORT, () => {
         console.log("Server Running On PORT:", Enviroment.PORT);
     });
