@@ -51,8 +51,11 @@ exports.getMusicStreamingInfo = async function (req, res) {
             if (!res.headersSent) {
                 res.status(502).send("Failed to fetch stream");
             }
-           
         });
+
+        res.on('close', () => {
+            stream.destroy()
+        })
 
         stream.pipe(res);
     } catch (error) {
