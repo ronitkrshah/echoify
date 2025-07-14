@@ -3,6 +3,7 @@ const { successResponse } = require("../utils");
 const { AppError } = require("../utils/errors");
 const { StatusCodes } = require("http-status-codes");
 const { Request, Response } = require("express");
+const { got } = require("got");
 
 /**
  * @param {Request} req
@@ -18,7 +19,47 @@ exports.getMusicStreamingInfo = async function (req, res) {
     if (!streamUrl)
         throw new AppError("No Streams Available", StatusCodes.NOT_FOUND);
 
-    res.status(StatusCodes.OK).json(successResponse(streamUrl));
+    try {
+        const stream = got.stream(streamUrl, {
+            headers: {
+                "User-Agent":
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                    "AppleWebKit/537.36 (KHTML, like Gecko) " +
+                    "Chrome/114.0.0.0 Safari/537.36",
+                Accept: "*/*",
+                Connection: "keep-alive",
+            },
+            isStream: true,
+            timeout: {
+                request: undefined,
+            },
+        });
+
+        stream.on("response", (ytRes) => {
+            ["content-type", "accept-ranges", "content-length"].forEach(
+                (it) => {
+                    res.setHeader(it, ytRes.headers[it]);
+                }
+            );
+        });
+
+        stream.on("close", () => {
+            stream.destroy()
+        })
+
+        stream.on("error", (err) => {
+            if (!res.headersSent) {
+                res.status(502).send("Failed to fetch stream");
+            }
+           
+        });
+
+        stream.pipe(res);
+    } catch (error) {
+        if (!res.headersSent) {
+            res.status(500).send("Internal server error");
+        }
+    }
 };
 
 /**
