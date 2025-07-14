@@ -127,7 +127,7 @@ class VirtualMusicPlayerService {
   /** Play Music */
   async playMusicAsync(music: Music, queueList: Music[] = []) {
     await this.resetAsync();
-    this.addMusicsToQueue(queueList.length === 0 ? [music] : queueList);
+    this.addMusicsToQueue(queueList);
     const track = await this.getRNTPTrackFromMusicAsync(music);
     await TrackPlayer.add([track]);
     await TrackPlayer.play();

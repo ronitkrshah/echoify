@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { FlatList, ToastAndroid, View } from "react-native";
 import { Music } from "~/models";
 import * as Device from "expo-device";
-import { Searchbar, Text, useTheme } from "react-native-paper";
+import { ActivityIndicator, Searchbar, Text, useTheme } from "react-native-paper";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { MusicListItem } from "../__shared__/components";
 import { NativeBottomTabScreenProps } from "@bottom-tabs/react-navigation";
@@ -36,6 +36,7 @@ const _holdOptions = [
 export default function OfflineScreen({ navigation }: TProps) {
   const [storedMusics, setStoredMusics] = useState<Music[]>([]);
   const [seach, setSearch] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
   const debouncedSearch = useDebounce(seach, 400);
 
   const theme = useTheme();
@@ -51,9 +52,13 @@ export default function OfflineScreen({ navigation }: TProps) {
     }
   }
 
-  async function getLocalMusicsAsync() {
-    const musics = await Media.getAssetsAsync({ mediaType: "audio", sortBy: "default" });
-
+  async function getLocalMusicsAsync(endCursor: undefined | string = undefined) {
+    const musics = await Media.getAssetsAsync({
+      mediaType: "audio",
+      sortBy: "default",
+      first: 25,
+      after: endCursor,
+    });
     return musics.assets.map(
       (it) =>
         new Music(
@@ -71,10 +76,41 @@ export default function OfflineScreen({ navigation }: TProps) {
     try {
       VirtualMusicPlayerService.setQueueType("PLAYLIST");
       await VirtualMusicPlayerService.playMusicAsync(music, storedMusics);
+      const allmusics = await getAllStoredMusicsAsync();
+
+      VirtualMusicPlayerService.addMusicsToQueue(
+        allmusics.map(
+          (it) =>
+            new Music(
+              it.id,
+              it.filename,
+              Device.deviceName ?? "System",
+              it.duration,
+              "ic_launcher",
+              it.uri
+            )
+        )
+      );
       playerController.showModal();
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     }
+  }
+
+  async function getAllStoredMusicsAsync() {
+    const musics = await Media.getAssetsAsync({
+      mediaType: "audio",
+      sortBy: "default",
+      first: 25,
+    });
+
+    return (
+      await Media.getAssetsAsync({
+        mediaType: "audio",
+        sortBy: "default",
+        first: musics.totalCount,
+      })
+    ).assets;
   }
 
   async function bootStrapAsync() {
@@ -92,14 +128,26 @@ export default function OfflineScreen({ navigation }: TProps) {
     if (debouncedSearch === "") {
       bootStrapAsync();
     } else {
-      getLocalMusicsAsync().then((data) => {
+      getAllStoredMusicsAsync().then((data) => {
         const filteredData = data.filter((it) =>
-          it.title
+          it.filename
             .toLowerCase()
             .replaceAll(" ", "")
             .includes(debouncedSearch.toLowerCase().replaceAll(" ", ""))
         );
-        setStoredMusics(filteredData);
+        setStoredMusics(
+          filteredData.map(
+            (it) =>
+              new Music(
+                it.id,
+                it.filename,
+                Device.deviceName ?? "System",
+                it.duration,
+                "ic_launcher",
+                it.uri
+              )
+          )
+        );
       });
     }
   }, [debouncedSearch]);
@@ -119,9 +167,18 @@ export default function OfflineScreen({ navigation }: TProps) {
       </View>
       <FlatList
         data={storedMusics}
-        onEndReachedThreshold={0.1}
+        onEndReachedThreshold={0.2}
         keyExtractor={(item) => item.videoId}
         contentContainerStyle={{ paddingHorizontal: 8, gap: 16 }}
+        ListFooterComponent={<ActivityIndicator animating={isFetching} />}
+        onEndReached={async () => {
+          if (storedMusics.length > 0 && seach === "") {
+            setIsFetching(true);
+            const music = await getLocalMusicsAsync(storedMusics.length.toString());
+            setStoredMusics((p) => [...p, ...music]);
+            setIsFetching(false);
+          }
+        }}
         renderItem={({ item, index }) => (
           <Animated.View
             style={{ borderRadius: 32, overflow: "hidden" }}
