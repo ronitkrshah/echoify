@@ -1,8 +1,6 @@
 # Echoify  
 > Yet Another YT Music Client for Android
 
-**First opening app may take up to 30 secs**
-
 ![GitHub License](https://img.shields.io/github/license/ronitkrshah/echoify)
 
 
@@ -17,6 +15,7 @@ Echoify is a libre, open-source YouTube Music client for Android, built with **R
 - **Ad-Free Playback**: Focus on music, not ads  
 - **Playlist Creation, Editing**  
 - **Search by Song**  
+- **Offline Player - Use as local song player**
 - **Privacy-Respecting**: No analytics, no trackers
 
 
