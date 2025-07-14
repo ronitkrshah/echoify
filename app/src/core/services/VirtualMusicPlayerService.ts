@@ -3,10 +3,11 @@ import TrackPlayer, {
   State,
   Track,
 } from "react-native-track-player";
-import { InnertubeApi } from "~/api";
 import { Music } from "~/models";
 import RecentsRepository from "~/repositories/RecentsRepository";
 import { asyncFuncExecutor } from "~/core/utils";
+import SessionStorage from "../utils/SessionStorage";
+import { AbstractBackendApi } from "~/abstracts";
 
 /**
  * The virtual list will help to track the current track and
@@ -64,7 +65,9 @@ class VirtualMusicPlayerService {
        */
       if (this._queueType === "PLAYLIST") return;
 
-      const relatedMusics = await InnertubeApi.getRealtedMusic(currentTrackId);
+      const api = SessionStorage.get<AbstractBackendApi>(AbstractBackendApi.name)!;
+
+      const relatedMusics = await api.getRealtedMusic(currentTrackId);
       this.addMusicsToQueue(relatedMusics);
       const nextTrack = await this.getRNTPTrackFromMusicAsync(relatedMusics[0]);
       TrackPlayer.add(nextTrack);
@@ -114,9 +117,8 @@ class VirtualMusicPlayerService {
     if (music?.streamingLink) {
       return Music.convertMusicToRNTPTrack(music, music.streamingLink);
     }
-    const [url, error] = await asyncFuncExecutor(() =>
-      InnertubeApi.getStreamingInfoAsync(music.videoId)
-    );
+    const api = SessionStorage.get<AbstractBackendApi>(AbstractBackendApi.name)!;
+    const [url, error] = await asyncFuncExecutor(() => api.getStreamingInfoAsync(music.videoId));
     if (!url) {
       throw new Error(error?.message || "Unable To Fetch Stream");
     }

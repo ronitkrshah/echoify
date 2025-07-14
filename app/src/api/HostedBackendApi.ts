@@ -1,3 +1,4 @@
+import { AbstractBackendApi } from "~/abstracts";
 import { Music, Playlist } from "~/models";
 
 type TApiMusic = {
@@ -21,13 +22,16 @@ type TPlaylistInfo = {
   videos: TApiMusic[];
 };
 
-class InnertubeApi {
-  private readonly _backendApi;
+class HostedBackendApi extends AbstractBackendApi {
+  public readonly NAME = "HostedBackendApi";
+  private _backendApi!: string;
 
   public constructor() {
+    super();
+  }
+  async setup(): Promise<void> {
     this._backendApi = `${process.env.EXPO_PUBLIC_API_URL}/api/v1`;
   }
-
   public async searchMusicsAsync(query: string) {
     const response = await fetch(`${this._backendApi}/songs?q=${query}`);
     const data = await response.json();
@@ -49,7 +53,7 @@ class InnertubeApi {
   }
 
   public async getStreamingInfoAsync(videoId: string): Promise<string> {
-    return `${this._backendApi}/stream/${videoId}`
+    return `${this._backendApi}/stream/${videoId}`;
   }
 
   public async getRealtedMusic(videoId: string) {
@@ -87,4 +91,4 @@ class InnertubeApi {
   }
 }
 
-export default new InnertubeApi();
+export default new HostedBackendApi();

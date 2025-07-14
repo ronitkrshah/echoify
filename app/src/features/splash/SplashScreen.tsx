@@ -7,6 +7,10 @@ import MaterialDesignIcons from "@react-native-vector-icons/material-design-icon
 import { Text, useTheme } from "react-native-paper";
 import { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LocalStorage } from "~/core/utils";
+import { AbstractBackendApi } from "~/abstracts";
+import { HostedBackendApi, InnertubeApi } from "~/api";
+import SessionStorage from "~/core/utils/SessionStorage";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SplashScreen">;
 
@@ -18,6 +22,16 @@ export default function SplashScreen({ navigation }: TProps) {
   async function bootStrapAsync() {
     MusicPlayerService.setupTrackPlayer();
     try {
+      const api = LocalStorage.getItem(AbstractBackendApi.name);
+
+      if (!api || api === HostedBackendApi.NAME) {
+        SessionStorage.set(AbstractBackendApi.name, HostedBackendApi);
+        await HostedBackendApi.setup();
+      } else {
+        SessionStorage.set(AbstractBackendApi.name, InnertubeApi);
+        await InnertubeApi.setup();
+      }
+
       await Database.initializeDatabaseConnection();
       await Database.runMigrationsAsync();
     } catch (error) {

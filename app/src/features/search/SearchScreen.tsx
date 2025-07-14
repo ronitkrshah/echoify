@@ -10,8 +10,10 @@ import MaterialDesignIcons from "@react-native-vector-icons/material-design-icon
 import Animated, { LinearTransition } from "react-native-reanimated";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { TStackNavigationRoutes } from "~/navigation";
-import { InnertubeApi } from "~/api";
+import { HostedBackendApi } from "~/api";
 import { SafeAreaView } from "react-native-safe-area-context";
+import SessionStorage from "~/core/utils/SessionStorage";
+import { AbstractBackendApi } from "~/abstracts";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchScreen">;
 
@@ -40,9 +42,8 @@ export default function SearchScreen({ navigation }: TProps) {
   }
 
   async function getSuggestionsFromApiAsync(query: string) {
-    const [suggestions] = await asyncFuncExecutor(() =>
-      InnertubeApi.getSearchSuggestionsAsync(query)
-    );
+    const api = SessionStorage.get<AbstractBackendApi>(AbstractBackendApi.name)!;
+    const [suggestions] = await asyncFuncExecutor(() => api.getSearchSuggestionsAsync(query));
     if (suggestions) {
       return suggestions.map((it) => ({ id: it, suggestion: it }));
     }

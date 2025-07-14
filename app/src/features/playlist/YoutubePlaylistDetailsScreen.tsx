@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Dimensions, FlatList, StyleSheet, ToastAndroid, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { InnertubeApi } from "~/api";
+import { HostedBackendApi } from "~/api";
 import { useLoadingDialog } from "~/core/components";
 import { Music } from "~/models";
 import { TStackNavigationRoutes } from "~/navigation";
@@ -11,12 +11,14 @@ import { VirtualMusicPlayerService } from "~/core/services";
 import { MusicListItem } from "../__shared__/components";
 import { usePlayerController } from "~/core/playerController";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { TPlaylistDetails } from "~/types";
+import SessionStorage from "~/core/utils/SessionStorage";
+import { AbstractBackendApi } from "~/abstracts";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "YoutubePlaylistDetailsScreen">;
 
 export default function YoutubePlaylistDetailsScreen({ navigation, route }: TProps) {
-  const [playlistDetails, setPlaylistDetails] =
-    useState<Awaited<ReturnType<typeof InnertubeApi.getPlaylistDetialsAsync>>>();
+  const [playlistDetails, setPlaylistDetails] = useState<TPlaylistDetails>();
   const theme = useTheme();
   const loadingDialog = useLoadingDialog();
   const playerController = usePlayerController();
@@ -35,7 +37,8 @@ export default function YoutubePlaylistDetailsScreen({ navigation, route }: TPro
   }
 
   useEffect(() => {
-    InnertubeApi.getPlaylistDetialsAsync(route.params.playlistId).then(setPlaylistDetails);
+    const api = SessionStorage.get<AbstractBackendApi>(AbstractBackendApi.name)!;
+    api.getPlaylistDetialsAsync(route.params.playlistId).then(setPlaylistDetails);
   }, []);
 
   return (

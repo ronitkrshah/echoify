@@ -5,19 +5,21 @@ import { HomeScreen } from "~/features/home";
 import { PlaylistScreen } from "~/features/playlist";
 import { RecentScreen } from "~/features/recents";
 import { OfflineScreen } from "~/features/offline";
+import { SettingsScreen } from "~/features/settings";
 
 export type TBottomTabRoutes = {
   HomeScreen: undefined;
   RecentsScreen: undefined;
   PlaylistsScreen: undefined;
   OfflineSongsScreen: undefined;
-  DownloadsScreen: undefined;
+  SettingsScreen: undefined;
 };
 
 const TrendingIcon = MaterialDesignIcons.getImageSourceSync("compass-outline", 24)!;
 const RecentsIcon = MaterialDesignIcons.getImageSourceSync("history", 24)!;
 const PlaylistsIcon = MaterialDesignIcons.getImageSourceSync("playlist-music", 24)!;
 const OfflineSongsIcon = MaterialDesignIcons.getImageSourceSync("disc-player", 24)!;
+const SettingsIcon = MaterialDesignIcons.getImageSourceSync("cog", 24)!;
 
 const Tabs = createNativeBottomTabNavigator<TBottomTabRoutes>();
 
@@ -49,6 +51,11 @@ export default function BottomTabsNavigation() {
         name="OfflineSongsScreen"
         component={OfflineScreen}
         options={{ tabBarLabel: "Offline", tabBarIcon: () => OfflineSongsIcon }}
+      />
+      <Tabs.Screen
+        name="SettingsScreen"
+        component={SettingsScreen}
+        options={{ tabBarLabel: "Settings", tabBarIcon: () => SettingsIcon }}
       />
     </Tabs.Navigator>
   );

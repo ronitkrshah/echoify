@@ -1,3 +1,4 @@
-import InnertubeApi from "./InntertubeApi";
+import HostedBackendApi from "./HostedBackendApi";
+import InnertubeApi from "./InnertubeApi";
 
-export { InnertubeApi };
+export { HostedBackendApi, InnertubeApi };

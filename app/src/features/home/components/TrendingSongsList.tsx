@@ -2,17 +2,21 @@ import { useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
 import { FlatList, ScrollView, ToastAndroid, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
-import { InnertubeApi } from "~/api";
 import { SkeletonLoader, useLoadingDialog } from "~/core/components";
 import { MusicListItem } from "~/features/__shared__/components";
 import { Music } from "~/models";
 import { VirtualMusicPlayerService } from "~/core/services";
 import { usePlayerController } from "~/core/playerController";
+import SessionStorage from "~/core/utils/SessionStorage";
+import { AbstractBackendApi } from "~/abstracts";
 
 export default function TrendingSongsList() {
   const newSongs = useQuery({
     queryKey: ["new_songs"],
-    queryFn: () => InnertubeApi.searchMusicsAsync("New Hindi Songs"),
+    queryFn: async () => {
+      const api = SessionStorage.get<AbstractBackendApi>(AbstractBackendApi.name)!;
+      return await api.searchMusicsAsync("New Hindi Songs");
+    },
   });
   const loadingDialog = useLoadingDialog();
   const playerController = usePlayerController();

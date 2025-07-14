@@ -7,7 +7,7 @@ import MaterialDesignIcons from "@react-native-vector-icons/material-design-icon
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useLoadingDialog } from "~/core/components";
 import { Music } from "~/models";
-import { InnertubeApi } from "~/api";
+import { HostedBackendApi } from "~/api";
 import TrackPlayer from "react-native-track-player";
 import { VirtualMusicPlayerService } from "~/core/services";
 import { Database } from "~/database";
@@ -15,6 +15,8 @@ import { PlaylistEntity, SongEntity } from "~/database/entities";
 import { MusicListItem } from "../__shared__/components";
 import { usePlayerController } from "~/core/playerController";
 import { SafeAreaView } from "react-native-safe-area-context";
+import SessionStorage from "~/core/utils/SessionStorage";
+import { AbstractBackendApi } from "~/abstracts";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchResultsScreen">;
 
@@ -26,7 +28,8 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
   const playerController = usePlayerController();
 
   useEffect(() => {
-    InnertubeApi.searchMusicsAsync(route.params.query).then(setSearchResult);
+    const api = SessionStorage.get<AbstractBackendApi>(AbstractBackendApi.name)!;
+    api.searchMusicsAsync(route.params.query).then(setSearchResult);
   }, []);
 
   async function handleSongClickAsync(music: Music) {
