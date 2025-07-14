@@ -35,7 +35,7 @@ exports.getMusicStreamingInfo = async function (req, res) {
             },
         });
 
-        stream.on("response", (ytRes) => {
+        stream.once("response", (ytRes) => {
             ["content-type", "accept-ranges", "content-length"].forEach(
                 (it) => {
                     res.setHeader(it, ytRes.headers[it]);
@@ -43,19 +43,20 @@ exports.getMusicStreamingInfo = async function (req, res) {
             );
         });
 
-        stream.on("close", () => {
-            stream.destroy()
-        })
-
-        stream.on("error", (err) => {
-            if (!res.headersSent) {
-                res.status(502).send("Failed to fetch stream");
-            }
+        stream.once("close", () => {
+            stream.destroy();
         });
 
-        res.on('close', () => {
-            stream.destroy()
-        })
+        stream.on("error", () => {
+            // Do Nothing
+        });
+        res.on("error", () => {
+            // Do Nothing
+        });
+
+        res.once("close", () => {
+            stream.destroy();
+        });
 
         stream.pipe(res);
     } catch (error) {
