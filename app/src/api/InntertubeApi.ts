@@ -49,14 +49,7 @@ class InnertubeApi {
   }
 
   public async getStreamingInfoAsync(videoId: string): Promise<string> {
-    const response = await fetch(`${this._backendApi}/stream/${videoId}`);
-    const data = await response.json();
-
-    if (data.status) {
-      return data.data;
-    }
-
-    throw new Error(data.message);
+    return `${this._backendApi}/stream/${videoId}`
   }
 
   public async getRealtedMusic(videoId: string) {
