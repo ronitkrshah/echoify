@@ -33,11 +33,7 @@ export default function RecentScreen({ navigation }: TProps) {
   async function handleMusicPressAsync(music: Music) {
     try {
       loadingDialog.show("Fetching Streams");
-      VirtualMusicPlayerService.setQueueType("PLAYLIST");
-      await VirtualMusicPlayerService.playMusicAsync(
-        music,
-        recentSongs.map((it) => Music.convertFromSongEntity(it))
-      );
+      await VirtualMusicPlayerService.playMusicAsync(music);
       playerController.showModal();
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
