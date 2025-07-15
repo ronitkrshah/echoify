@@ -5,18 +5,12 @@ import { useEffect, useState } from "react";
 import { ToastAndroid } from "react-native";
 import { List, Switch, useTheme } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AbstractBackendApi } from "~/abstracts";
-import { HostedBackendApi, InnertubeApi } from "~/api";
+import { AbstractStreamingService } from "~/abstracts";
 import { useAlertDialog, useLoadingDialog } from "~/core/components";
 import { LocalStorage } from "~/core/utils";
 import SessionStorage from "~/core/utils/SessionStorage";
-import { TStackNavigationRoutes } from "~/navigation";
-import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
-
-type TProps = CompositeScreenProps<
-  NativeBottomTabScreenProps<TBottomTabRoutes, "RecentsScreen">,
-  NativeStackScreenProps<TStackNavigationRoutes>
->;
+import MaterialIcons from "@react-native-vector-icons/material-design-icons";
+import { DefaultStreamingService, InnertubeStreamingService } from "~/services";
 
 export default function SettingsScreen() {
   const [isSwitchOn, setIsSwitchOn] = useState(false);
@@ -27,20 +21,20 @@ export default function SettingsScreen() {
   function toggleSwitch() {
     if (isSwitchOn) {
       setIsSwitchOn(false);
-      SessionStorage.set(AbstractBackendApi.name, HostedBackendApi);
-      LocalStorage.setItem(AbstractBackendApi.name, HostedBackendApi.NAME);
+      SessionStorage.set(AbstractStreamingService.name, DefaultStreamingService);
+      LocalStorage.setItem(AbstractStreamingService.name, DefaultStreamingService.NAME);
     } else {
       alertDialog.show({
-        title: "Activate Built-in Innertube Service",
+        title: "Powering Up Gawd Mode",
         description:
-          "Initial setup may take up to 1 minute; afterward, it typically completes in under 10 seconds. If YouTube Music is blocked in your region, it's recommended to keep this feature disabled.",
-        confirmText: "ACTIVATE",
+          "One-time setup may take a minute. After that, it’s turbo.\n\nIf YouTube Music is blocked in your area, don’t flex with this mode.",
+        confirmText: "ENABLE",
         async onConfirm() {
           try {
-            busyModal.show("Setting Up Innertube Service");
-            await InnertubeApi.setup();
-            SessionStorage.set(AbstractBackendApi.name, InnertubeApi);
-            LocalStorage.setItem(AbstractBackendApi.name, InnertubeApi.NAME);
+            busyModal.show("Installing Skill Issue Fix...");
+            await InnertubeStreamingService.setup();
+            SessionStorage.set(AbstractStreamingService.name, InnertubeStreamingService);
+            LocalStorage.setItem(AbstractStreamingService.name, InnertubeStreamingService.NAME);
             setIsSwitchOn(true);
           } catch (error) {
             ToastAndroid.show("Failed To Set Builtin Innertube Service", ToastAndroid.SHORT);
@@ -53,18 +47,20 @@ export default function SettingsScreen() {
   }
 
   useEffect(() => {
-    const api = SessionStorage.get<AbstractBackendApi>(AbstractBackendApi.name)!;
-    setIsSwitchOn(api.NAME === InnertubeApi.NAME);
+    const api = SessionStorage.get<AbstractStreamingService>(AbstractStreamingService.name)!;
+    setIsSwitchOn(api.NAME === InnertubeStreamingService.NAME);
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, paddingHorizontal: 16 }}>
       <List.Item
-        title="Use builtin innertube service"
-        description="Using builtin innertube service will increase data fetching speed and improve streaming with minimal or no buffering (depends on your internet). May slightly delay app startup, but overall performance remains smooth."
+        title="Gawd Mode"
+        description="Slow streaming is for nub peoples. Switch to Gawd Mode"
         descriptionNumberOfLines={6}
         titleStyle={{ fontSize: 22, color: theme.colors.primary, fontWeight: "bold" }}
         right={() => <Switch value={isSwitchOn} onValueChange={toggleSwitch} />}
+        left={() => <MaterialIcons name="skull-outline" size={24} color={theme.colors.primary} />}
+        containerStyle={{ alignItems: "center" }}
       />
     </SafeAreaView>
   );

@@ -6,10 +6,8 @@ import { Fragment } from "react";
 import { FlatList, Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import Animated, { FadeInRight } from "react-native-reanimated";
-import { AbstractBackendApi } from "~/abstracts";
 import { HostedBackendApi } from "~/api";
 import { SkeletonLoader } from "~/core/components";
-import SessionStorage from "~/core/utils/SessionStorage";
 import { TStackNavigationRoutes } from "~/navigation";
 import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 
@@ -27,10 +25,7 @@ const _cardSize = 250;
 export default function Playlists({ query, headerTitle }: TProps) {
   const playlistInfo = useQuery({
     queryKey: ["playlist_info", query],
-    queryFn: async () => {
-      const api = SessionStorage.get<AbstractBackendApi>(AbstractBackendApi.name)!;
-      return await api.serachPlaylistsAsync(query);
-    },
+    queryFn: async () => HostedBackendApi.serachPlaylistsAsync(query)
   });
   const theme = useTheme();
   const navigation = useNavigation<Navigation>();

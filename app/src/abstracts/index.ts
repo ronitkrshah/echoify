@@ -1,3 +1,3 @@
-import { AbstractBackendApi } from "./AbstractBackendApi";
+import { AbstractStreamingService } from "./AbstractStreamingService";
 
-export { AbstractBackendApi };
+export { AbstractStreamingService };

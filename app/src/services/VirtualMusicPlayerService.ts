@@ -6,8 +6,9 @@ import TrackPlayer, {
 import { Music } from "~/models";
 import RecentsRepository from "~/repositories/RecentsRepository";
 import { asyncFuncExecutor } from "~/core/utils";
-import SessionStorage from "../utils/SessionStorage";
-import { AbstractBackendApi } from "~/abstracts";
+import SessionStorage from "~/core/utils/SessionStorage";
+import { AbstractStreamingService } from "~/abstracts";
+import { HostedBackendApi } from "~/api";
 
 /**
  * The virtual list will help to track the current track and
@@ -64,10 +65,7 @@ class VirtualMusicPlayerService {
        * just stops the player
        */
       if (this._queueType === "PLAYLIST") return;
-
-      const api = SessionStorage.get<AbstractBackendApi>(AbstractBackendApi.name)!;
-
-      const relatedMusics = await api.getRealtedMusic(currentTrackId);
+      const relatedMusics = await HostedBackendApi.getRealtedMusic(currentTrackId);
       this.addMusicsToQueue(relatedMusics);
       const nextTrack = await this.getRNTPTrackFromMusicAsync(relatedMusics[0]);
       TrackPlayer.add(nextTrack);
@@ -117,8 +115,8 @@ class VirtualMusicPlayerService {
     if (music?.streamingLink) {
       return Music.convertMusicToRNTPTrack(music, music.streamingLink);
     }
-    const api = SessionStorage.get<AbstractBackendApi>(AbstractBackendApi.name)!;
-    const [url, error] = await asyncFuncExecutor(() => api.getStreamingInfoAsync(music.videoId));
+    const api = SessionStorage.get<AbstractStreamingService>(AbstractStreamingService.name)!;
+    const [url, error] = await asyncFuncExecutor(() => api.getStreamURLAsync(music.videoId));
     if (!url) {
       throw new Error(error?.message || "Unable To Fetch Stream");
     }

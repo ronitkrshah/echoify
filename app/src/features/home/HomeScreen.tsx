@@ -14,7 +14,7 @@ import {
 } from "./components";
 import { useEffect } from "react";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { AppUpdateService } from "~/core/services";
+import { AppUpdateService } from "~/services";
 import { useAlertDialog } from "~/core/components";
 import { SafeAreaView } from "react-native-safe-area-context";
 

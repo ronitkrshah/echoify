@@ -1,4 +1,3 @@
-import { AbstractBackendApi } from "~/abstracts";
 import { Music, Playlist } from "~/models";
 
 type TApiMusic = {
@@ -22,16 +21,13 @@ type TPlaylistInfo = {
   videos: TApiMusic[];
 };
 
-class HostedBackendApi extends AbstractBackendApi {
-  public readonly NAME = "HostedBackendApi";
+class HostedBackendApi {
   private _backendApi!: string;
 
   public constructor() {
-    super();
-  }
-  async setup(): Promise<void> {
     this._backendApi = `${process.env.EXPO_PUBLIC_API_URL}/api/v1`;
   }
+
   public async searchMusicsAsync(query: string) {
     const response = await fetch(`${this._backendApi}/songs?q=${query}`);
     const data = await response.json();

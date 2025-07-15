@@ -7,13 +7,11 @@ import { HostedBackendApi } from "~/api";
 import { useLoadingDialog } from "~/core/components";
 import { Music } from "~/models";
 import { TStackNavigationRoutes } from "~/navigation";
-import { VirtualMusicPlayerService } from "~/core/services";
+import { VirtualMusicPlayerService } from "~/services";
 import { MusicListItem } from "../__shared__/components";
 import { usePlayerController } from "~/core/playerController";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TPlaylistDetails } from "~/types";
-import SessionStorage from "~/core/utils/SessionStorage";
-import { AbstractBackendApi } from "~/abstracts";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "YoutubePlaylistDetailsScreen">;
 
@@ -37,8 +35,7 @@ export default function YoutubePlaylistDetailsScreen({ navigation, route }: TPro
   }
 
   useEffect(() => {
-    const api = SessionStorage.get<AbstractBackendApi>(AbstractBackendApi.name)!;
-    api.getPlaylistDetialsAsync(route.params.playlistId).then(setPlaylistDetails);
+    HostedBackendApi.getPlaylistDetialsAsync(route.params.playlistId).then(setPlaylistDetails);
   }, []);
 
   return (

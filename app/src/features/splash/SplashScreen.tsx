@@ -2,14 +2,13 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Dimensions, StyleSheet, ToastAndroid, View } from "react-native";
 import { Database } from "~/database";
 import { TStackNavigationRoutes } from "~/navigation";
-import { MusicPlayerService } from "~/core/services";
+import { DefaultStreamingService, InnertubeStreamingService, MusicPlayerService } from "~/services";
 import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { Text, useTheme } from "react-native-paper";
 import { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LocalStorage } from "~/core/utils";
-import { AbstractBackendApi } from "~/abstracts";
-import { HostedBackendApi, InnertubeApi } from "~/api";
+import { AbstractStreamingService } from "~/abstracts";
 import SessionStorage from "~/core/utils/SessionStorage";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SplashScreen">;
@@ -22,14 +21,14 @@ export default function SplashScreen({ navigation }: TProps) {
   async function bootStrapAsync() {
     MusicPlayerService.setupTrackPlayer();
     try {
-      const api = LocalStorage.getItem(AbstractBackendApi.name);
+      const streamingService = LocalStorage.getItem(AbstractStreamingService.name);
 
-      if (!api || api === HostedBackendApi.NAME) {
-        SessionStorage.set(AbstractBackendApi.name, HostedBackendApi);
-        await HostedBackendApi.setup();
+      if (!streamingService || streamingService === DefaultStreamingService.NAME) {
+        SessionStorage.set(AbstractStreamingService.name, DefaultStreamingService);
+        await DefaultStreamingService.setup();
       } else {
-        SessionStorage.set(AbstractBackendApi.name, InnertubeApi);
-        await InnertubeApi.setup();
+        SessionStorage.set(AbstractStreamingService.name, InnertubeStreamingService);
+        await InnertubeStreamingService.setup();
       }
 
       await Database.initializeDatabaseConnection();

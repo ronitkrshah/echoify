@@ -42,8 +42,7 @@ export default function SearchScreen({ navigation }: TProps) {
   }
 
   async function getSuggestionsFromApiAsync(query: string) {
-    const api = SessionStorage.get<AbstractBackendApi>(AbstractBackendApi.name)!;
-    const [suggestions] = await asyncFuncExecutor(() => api.getSearchSuggestionsAsync(query));
+    const [suggestions] = await asyncFuncExecutor(() => HostedBackendApi.getSearchSuggestionsAsync(query));
     if (suggestions) {
       return suggestions.map((it) => ({ id: it, suggestion: it }));
     }

@@ -12,7 +12,7 @@ import { MusicListItem } from "../__shared__/components";
 import { Music } from "~/models";
 import { Text, useTheme } from "react-native-paper";
 import { useLoadingDialog } from "~/core/components";
-import { VirtualMusicPlayerService } from "~/core/services";
+import { VirtualMusicPlayerService } from "~/services";
 import { usePlayerController } from "~/core/playerController";
 import { SafeAreaView } from "react-native-safe-area-context";
 

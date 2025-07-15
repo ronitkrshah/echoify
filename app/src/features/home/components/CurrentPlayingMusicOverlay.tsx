@@ -15,7 +15,7 @@ import { IconButton, Text, useTheme } from "react-native-paper";
 import { useEffect } from "react";
 import { usePlayerController } from "~/core/playerController";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { VirtualMusicPlayerService } from "~/core/services";
+import { VirtualMusicPlayerService } from "~/services";
 
 export default function CurrentPlayingMusicOverlay() {
   const overlayYSharedValue = useSharedValue(0);

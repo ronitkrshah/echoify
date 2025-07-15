@@ -4,7 +4,7 @@ import { ScrollView, ToastAndroid, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import { SkeletonLoader, useLoadingDialog } from "~/core/components";
 import { usePlayerController } from "~/core/playerController";
-import { VirtualMusicPlayerService } from "~/core/services";
+import { VirtualMusicPlayerService } from "~/services";
 import { MusicListItem } from "~/features/__shared__/components";
 import { Music } from "~/models";
 import RecentsRepository from "~/repositories/RecentsRepository";

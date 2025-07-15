@@ -12,7 +12,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { TStackNavigationRoutes } from "~/navigation";
 import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { VirtualMusicPlayerService } from "~/core/services";
+import { VirtualMusicPlayerService } from "~/services";
 import { usePlayerController } from "~/core/playerController";
 import * as Sharing from "expo-sharing";
 import { useDebounce } from "~/hooks";

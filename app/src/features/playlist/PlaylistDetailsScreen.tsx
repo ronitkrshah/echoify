@@ -10,7 +10,7 @@ import { LocalPlaylistRepository } from "~/repositories";
 import { sleepThreadAsync } from "~/core/utils";
 import { MusicListItem } from "../__shared__/components";
 import { Music } from "~/models";
-import { VirtualMusicPlayerService } from "~/core/services";
+import { VirtualMusicPlayerService } from "~/services";
 import { usePlayerController } from "~/core/playerController";
 import { SafeAreaView } from "react-native-safe-area-context";
 
