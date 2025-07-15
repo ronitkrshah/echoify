@@ -19,7 +19,6 @@ class InnertubeApi extends AbstractBackendApi {
     if (!this._innertube) {
       this._innertube = await getInnertube();
     }
-    this._innertube;
   }
 
   public async searchMusicsAsync(query: string): Promise<Music[]> {
@@ -48,7 +47,7 @@ class InnertubeApi extends AbstractBackendApi {
           new Music(
             music.id!,
             music.title! ?? "Unknown Track",
-            music.artists?.[0].name ?? "Unknown Artist",
+            music.artists?.map((it) => it.name).join(", ") ?? "Unknown Artist",
             music.duration?.seconds || 0,
             music.thumbnails[0].url
           )
@@ -112,7 +111,7 @@ class InnertubeApi extends AbstractBackendApi {
           new Music(
             music.id!,
             music.title! ?? "Unknown Track",
-            music.artists?.[0].name ?? "Unknown Artist",
+            music.artists?.map((it) => it.name).join(", ") ?? "Unknown Artist",
             music.duration?.seconds || 0,
             music.thumbnails[0].url
           )
@@ -121,6 +120,7 @@ class InnertubeApi extends AbstractBackendApi {
         return [];
       }
     }
+
     return retVal;
   }
 

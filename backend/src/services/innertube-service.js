@@ -55,7 +55,9 @@ class InnertubeService {
                 retVal.push({
                     id: music.id,
                     title: music.title ?? "Unknown",
-                    author: music.artists[0].name,
+                    author:
+                        music.artists?.map((it) => it.name).join(", ") ??
+                        "Unknown Artist",
                     duration: music.duration?.seconds || 0,
                     thumbnail: music.thumbnail?.contents[0].url,
                 });
@@ -118,7 +120,9 @@ class InnertubeService {
                 retVal.push({
                     id: music.id,
                     title: music.title ?? "Unknown",
-                    author: music.artists[0].name,
+                    author:
+                        music.artists?.map((it) => it.name).join(", ") ??
+                        "Unknown Artist",
                     duration: music.duration?.seconds || 0,
                     thumbnail: music.thumbnail?.contents[0].url,
                 });
