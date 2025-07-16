@@ -1,13 +1,13 @@
 import { NativeBottomTabNavigationProp } from "@bottom-tabs/react-navigation";
 import { CompositeNavigationProp, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useQuery } from "@tanstack/react-query";
-import { Fragment } from "react";
-import { FlatList, Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Fragment, useEffect, useState } from "react";
+import { FlatList, Image, Pressable, ScrollView, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import Animated, { FadeInRight } from "react-native-reanimated";
 import { HostedBackendApi } from "~/api";
 import { SkeletonLoader } from "~/core/components";
+import { Playlist } from "~/models";
 import { TStackNavigationRoutes } from "~/navigation";
 import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 
@@ -23,16 +23,24 @@ type Navigation = CompositeNavigationProp<
 const _cardSize = 250;
 
 export default function Playlists({ query, headerTitle }: TProps) {
-  const playlistInfo = useQuery({
-    queryKey: ["playlist_info", query],
-    queryFn: async () => HostedBackendApi.serachPlaylistsAsync(query)
-  });
+  const [playlists, setPlaylists] = useState<Playlist[] | undefined>();
+
   const theme = useTheme();
   const navigation = useNavigation<Navigation>();
 
+  useEffect(() => {
+    HostedBackendApi.serachPlaylistsAsync(query)
+      .then((data) => {
+        setPlaylists(data ?? []);
+      })
+      .catch(() => {
+        setPlaylists([]);
+      });
+  }, []);
+
   return (
     <View>
-      {playlistInfo.isFetching && (
+      {playlists === undefined && (
         <ScrollView
           horizontal
           contentContainerStyle={{ gap: 16 }}
@@ -51,7 +59,7 @@ export default function Playlists({ query, headerTitle }: TProps) {
         </ScrollView>
       )}
 
-      {playlistInfo.data && !playlistInfo.isFetching && (
+      {playlists && (
         <Fragment>
           <Text variant="titleLarge" style={{ color: theme.colors.primary, fontWeight: "bold" }}>
             {headerTitle}
@@ -60,7 +68,7 @@ export default function Playlists({ query, headerTitle }: TProps) {
           <FlatList
             showsHorizontalScrollIndicator={false}
             horizontal
-            data={playlistInfo.data}
+            data={playlists}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item, index }) => {
               return (

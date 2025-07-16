@@ -1,5 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { FlatList, ScrollView, ToastAndroid, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import { SkeletonLoader, useLoadingDialog } from "~/core/components";
@@ -10,12 +9,11 @@ import { usePlayerController } from "~/core/playerController";
 import { HostedBackendApi } from "~/api";
 
 export default function TrendingSongsList() {
-  const newSongs = useQuery({
-    queryKey: ["new_songs"],
-    queryFn: async () => HostedBackendApi.searchMusicsAsync("New Hindi Songs") 
-  });
+  const [trendingMusics, setTrendingMusics] = useState<Music[] | undefined>(undefined);
   const loadingDialog = useLoadingDialog();
   const playerController = usePlayerController();
+  const chunkedData = chunkArray(trendingMusics ?? [], 3);
+  const theme = useTheme();
 
   function chunkArray(arr: Music[], size: number) {
     return Array.from({ length: Math.ceil(arr.length / size) }, (_, index) =>
@@ -27,7 +25,7 @@ export default function TrendingSongsList() {
     try {
       loadingDialog.show("Fetching Streams");
       VirtualMusicPlayerService.setQueueType("PLAYLIST");
-      await VirtualMusicPlayerService.playMusicAsync(music, newSongs.data);
+      await VirtualMusicPlayerService.playMusicAsync(music, trendingMusics);
       playerController.showModal();
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
@@ -36,12 +34,17 @@ export default function TrendingSongsList() {
     }
   }
 
-  const chunkedData = chunkArray(newSongs.data ?? [], 3);
+  useEffect(() => {
+    HostedBackendApi.searchMusicsAsync("New Hindi Songs")
+      .then(setTrendingMusics)
+      .catch(() => {
+        setTrendingMusics([]);
+      });
+  }, []);
 
-  const theme = useTheme();
   return (
     <View>
-      {newSongs.isFetching && (
+      {trendingMusics === undefined && (
         <ScrollView
           horizontal
           contentContainerStyle={{ gap: 16 }}
@@ -68,7 +71,7 @@ export default function TrendingSongsList() {
         </ScrollView>
       )}
 
-      {newSongs.data && !newSongs.isFetching && (
+      {trendingMusics && (
         <Fragment>
           <Text
             variant="titleLarge"

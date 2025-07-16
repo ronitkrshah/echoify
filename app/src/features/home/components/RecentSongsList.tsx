@@ -1,5 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { ScrollView, ToastAndroid, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import { SkeletonLoader, useLoadingDialog } from "~/core/components";
@@ -8,14 +7,10 @@ import { VirtualMusicPlayerService } from "~/services";
 import { MusicListItem } from "~/features/__shared__/components";
 import { Music } from "~/models";
 import RecentsRepository from "~/repositories/RecentsRepository";
+import { SongEntity } from "~/database/entities";
 
 export default function RecentSongsList() {
-  const recentMusics = useQuery({
-    queryKey: ["recents"],
-    queryFn: async () => {
-      return (await RecentsRepository.getLimitedMusicsAsync(0, 3)) ?? [];
-    },
-  });
+  const [recentMusics, setRecentMusics] = useState<SongEntity[] | undefined>(undefined);
   const theme = useTheme();
   const loadingDialog = useLoadingDialog();
   const playerController = usePlayerController();
@@ -23,7 +18,7 @@ export default function RecentSongsList() {
   async function handleMusicPressAsync(music: Music) {
     try {
       loadingDialog.show("Fetching Streams");
-      VirtualMusicPlayerService.setQueueType("PLAYLIST");
+      VirtualMusicPlayerService.setQueueType("NORMAL");
       const firstFewRecents = await RecentsRepository.getLimitedMusicsAsync(0, 20);
       await VirtualMusicPlayerService.playMusicAsync(
         music,
@@ -37,9 +32,19 @@ export default function RecentSongsList() {
     }
   }
 
+  useEffect(() => {
+    RecentsRepository.getLimitedMusicsAsync(0, 3)
+      .then((data) => {
+        setRecentMusics(data ?? []);
+      })
+      .catch(() => {
+        setRecentMusics([]);
+      });
+  }, []);
+
   return (
     <View style={{ gap: 16 }}>
-      {recentMusics.data && recentMusics.data.length > 0 && (
+      {recentMusics && recentMusics.length > 0 && (
         <Text variant="titleLarge" style={{ color: theme.colors.primary, fontWeight: "bold" }}>
           Recents
         </Text>
@@ -50,7 +55,7 @@ export default function RecentSongsList() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ gap: 30 }}
       >
-        {recentMusics.isFetching && (
+        {recentMusics === undefined && (
           <Fragment>
             <SkeletonLoader
               height={70}
@@ -69,7 +74,7 @@ export default function RecentSongsList() {
           </Fragment>
         )}
 
-        {recentMusics.data?.map((it, index) => {
+        {recentMusics?.map((it, index) => {
           return (
             <View
               key={it.id.toString()}
