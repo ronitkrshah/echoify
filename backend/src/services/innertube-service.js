@@ -6,7 +6,7 @@ class InnertubeService {
 
     async setupInnertube() {
         this.#_innertube = await Innertube.create({
-            cache: new UniversalCache(true),
+            enable_session_cache: false,
         });
     }
 
@@ -68,40 +68,6 @@ class InnertubeService {
     }
 
     /**
-     * Return Array Of Playlists
-     * @param {string} query
-     */
-    async getPlaylists(query) {
-        const data = await this.#_innertube.music.search(query, {
-            type: "playlist",
-        });
-
-        /** @type { YTNodes.MusicShelf | undefined} */
-        let musicShelf;
-
-        for (const item of data.contents) {
-            if (item.type === YTNodes.MusicShelf.name) {
-                musicShelf = item;
-                break;
-            }
-        }
-
-        if (!musicShelf) throw new Error("MusicShelf Isn't Available");
-
-        const retval = [];
-
-        for (const playlist of musicShelf.contents) {
-            retval.push({
-                id: playlist.id,
-                name: playlist.title ?? "Unknown",
-                thumbnail: playlist.thumbnail?.contents[0].url,
-            });
-        }
-
-        return retval;
-    }
-
-    /**
      * Return Next Music
      * @param {string} musicId
      */
@@ -133,6 +99,40 @@ class InnertubeService {
         const random = Math.floor(Math.random * retVal.length);
 
         return [retVal[random]];
+    }
+
+    /**
+     * Return Array Of Playlists
+     * @param {string} query
+     */
+    async getPlaylists(query) {
+        const data = await this.#_innertube.music.search(query, {
+            type: "playlist",
+        });
+
+        /** @type { YTNodes.MusicShelf | undefined} */
+        let musicShelf;
+
+        for (const item of data.contents) {
+            if (item.type === YTNodes.MusicShelf.name) {
+                musicShelf = item;
+                break;
+            }
+        }
+
+        if (!musicShelf) throw new Error("MusicShelf Isn't Available");
+
+        const retval = [];
+
+        for (const playlist of musicShelf.contents) {
+            retval.push({
+                id: playlist.id,
+                name: playlist.title ?? "Unknown",
+                thumbnail: playlist.thumbnail?.contents[0].url,
+            });
+        }
+
+        return retval;
     }
 
     /**
