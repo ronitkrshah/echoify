@@ -7,6 +7,61 @@ import { Music } from "~/models";
 import { VirtualMusicPlayerService } from "~/services";
 import { usePlayerController } from "~/core/playerController";
 import { HostedBackendApi } from "~/api";
+import moment from "moment";
+import * as Localization from "expo-localization";
+
+const _year = moment().format("YYYY");
+const _countryCodeBasedQueryTemplates: Record<string, string> = {
+  AF: `${_year} popular music Afghanistan`,
+  AR: `${_year} música argentina popular`,
+  AT: `${_year} österreichische hits`,
+  AU: `${_year} Australian top songs`,
+  BD: `${_year} জনপ্রিয় বাংলা গান`,
+  BE: `${_year} populaire muziek België`,
+  BR: `${_year} músicas populares Brasil`,
+  CA: `${_year} Canadian top music`,
+  CH: `${_year} Schweizer Hits`,
+  CN: `${_year} 华语流行歌曲`,
+  CO: `${_year} canciones populares Colombia`,
+  CZ: `${_year} české hity`,
+  DE: `${_year} deutscher chart musik`,
+  DK: `${_year} danske populære sange`,
+  EC: `${_year} música popular Ecuador`,
+  EG: `${_year} موسيقى مصرية شعبية`,
+  ES: `${_year} éxitos España`,
+  FI: `${_year} suomalaista suosikkimusiikkia`,
+  FR: `${_year} musique populaire France`,
+  GB: `${_year} UK top songs`,
+  GR: `${_year} ελληνικά δημοφιλή τραγούδια`,
+  HK: `${_year} 香港流行歌曲`,
+  ID: `${_year} lagu populer Indonesia`,
+  IE: `${_year} Irish top music`,
+  IN: `${_year} Hindi trending songs`,
+  IT: `${_year} musica italiana popolare`,
+  JP: `${_year}年日本のヒット曲`,
+  KR: `${_year} 한국 인기 노래`,
+  LT: `${_year} populiariausi lietuviški hitai`,
+  MX: `${_year} canciones populares México`,
+  MY: `${_year} lagu popular Malaysia`,
+  NL: `${_year} Nederlandse top muziek`,
+  NO: `${_year} norske populære sanger`,
+  NZ: `${_year} New Zealand top songs`,
+  PK: `${_year} پاکستانی مقبول گانے`,
+  PH: `${_year} pinakasikat na kanta Pilipinas`,
+  PL: `${_year} polskie hity`,
+  PT: `${_year} músicas populares Portugal`,
+  RO: `${_year} muzică populară România`,
+  RU: `${_year} популярные песни России`,
+  SE: `${_year} svenska topplåtar`,
+  SG: `${_year} popular songs Singapore`,
+  TH: `${_year} เพลงไทยยอดนิยม`,
+  TR: `${_year} popüler Türkçe şarkılar`,
+  TW: `${_year} 台灣熱門歌曲`,
+  UA: `${_year} популярні пісні Україна`,
+  US: `${_year} US top music`,
+  VN: `${_year} nhạc Việt Nam hay nhất`,
+  ZA: `${_year} South Africa popular songs`,
+};
 
 export default function TrendingSongsList() {
   const [trendingMusics, setTrendingMusics] = useState<Music[] | undefined>(undefined);
@@ -35,7 +90,19 @@ export default function TrendingSongsList() {
   }
 
   useEffect(() => {
-    HostedBackendApi.searchMusicsAsync("New Hindi Songs")
+    const locales = Localization.getLocales();
+    let query = _countryCodeBasedQueryTemplates["US"];
+    if (locales.length > 0) {
+      const locale = locales[0];
+      if (
+        locale.regionCode &&
+        Object.keys(_countryCodeBasedQueryTemplates).includes(locale.regionCode)
+      ) {
+        query = _countryCodeBasedQueryTemplates[locale.regionCode];
+      }
+    }
+
+    HostedBackendApi.searchMusicsAsync(query)
       .then(setTrendingMusics)
       .catch(() => {
         setTrendingMusics([]);

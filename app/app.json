@@ -26,7 +26,6 @@
           "backgroundColor": "#232023"
         }
       },
-
       "edgeToEdgeEnabled": true,
       "package": "io.github.ronitkrshah.echoify.dev"
     },
@@ -47,7 +46,8 @@
           "imageWidth": 200
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-localization"
     ]
   }
 }
