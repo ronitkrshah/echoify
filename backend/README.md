@@ -1,91 +1,136 @@
-# Echoify Backend
+# 🎵 Echoify Backend
 
-## Endpoints (`/api/v1`)
+Core Backend For Echoify Music App
 
--   `/stream/:id`
+<br />
 
-    ```json
-    {
-        "status": true,
-        "data": "Streaming Link"
-    }
-    ```
+## 🌐 Base URL
 
--   `/searchSuggestions?q=RickRoll`
+🛠 **You can self-host this backend on platforms like [Vercel](https://vercel.com), [Render](https://render.com), [Railway](https://railway.app), or your own VPS.**
 
-    ```json
-    {
-        "status": true,
-        "data": ["rick roll"]
-    }
-    ```
+> Base Endpoint: `https://DOMAIN/api/v1`
 
--   `/songs?q=RickRoll`
+<br />
 
-    ```json
-    {
-        "status": true,
-        "data": [
-            {
-                "id": "lYBUbBu4W08",
-                "title": "Never Gonna Give You Up",
-                "author": "Rick Astley",
-                "duration": 214,
-                "thumbnail": "https://lh3.googleusercontent.com/eC9DfRcYSk4FE-fvDCJSu_4xsKdVMKxwmFTYFZwP8OqB7R4TKxAjKoR-Kp1lXeRi2WddPFYulSte4eW-=w120-h120-l90-rj"
-            }
-        ]
-    }
-    ```
+# 📡 Endpoints
 
--   `/relatedSongs/[currentSongId]`
+### 🔊 Stream a Song
 
-    ```json
-    {
-        "status": true,
-        "data": [
-            {
-                "id": "lYBUbBu4W08",
-                "title": "Never Gonna Give You Up",
-                "author": "Rick Astley",
-                "duration": 214,
-                "thumbnail": "https://lh3.googleusercontent.com/eC9DfRcYSk4FE-fvDCJSu_4xsKdVMKxwmFTYFZwP8OqB7R4TKxAjKoR-Kp1lXeRi2WddPFYulSte4eW-=w120-h120-l90-rj"
-            }
-        ]
-    }
-    ```
+**GET** `/stream/:id`: Stream Directly
 
--   `/playlists?q="bollywood"`
+### 🔍 Search Suggestions
 
-    ```json
-    {
-        "status": true,
-        "data": [
-            {
-                "id": "VLRDCLAK5uy_k2M7Bug3ZvV6NgY8QLsSNPD5I-AQz7wMo",
-                "name": "80s Bollywood",
-                "thumbnail": "https://lh3.googleusercontent.com/twtZoAVWxJUgUk62bPEPDuxqXPEkReKeIc_31xi2jNRagPLYzBG356LUbBMB_xHJfbWWphbLWaIcsRA=w544-h544-l90-rj"
-            }
-        ]
-    }
-    ```
+**GET** `/searchSuggestions?q=<query>`
 
--   `/playlists/VLRDCLAK5uy_k2M7Bug3ZvV6NgY8QLsSNPD5I-AQz7wMo`
-    ```json
-    {
-        "status": true,
-        "data": {
-            "title": "80s Bollywood",
-            "totalVideos": "99 videos",
-            "thumnail": "https://i9.ytimg.com/s_p/RDCLAK5uy_k2M7Bug3ZvV6NgY8QLsSNPD5I-AQz7wMo/maxresdefault.jpg?sqp=COy9x8MGir7X7AMICKnPpb0GEAE=&rs=AOn4CLDuXA6-7csZON-T1bX4neLkBr7DPA&v=1739155369",
-            "videos": [
-                {
-                    "id": "sWqjZpBtcxc",
-                    "title": "Aye Mere Humsafar Full Song | Qayamat Se Qayamat Tak | Udit N | Alka Y| Aamir Khan, Juhi Chawla",
-                    "author": "T-Series Bollywood Classics",
-                    "duration": 314,
-                    "thumbnail": "https://i.ytimg.com/vi/sWqjZpBtcxc/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDCQI10Hd6fp4GytCWVXqxxujOiEw"
-                }
-            ]
+Provides real-time search suggestions based on the query.
+
+```json
+{
+    "status": true,
+    "data": ["string", "string"]
+}
+```
+
+### 🎶 Search Songs
+
+**GET** `/songs?q=<query>`
+
+Searches for songs based on the query string.
+
+```json
+{
+    "status": true,
+    "data": [
+        {
+            "id": "string",
+            "title": "string",
+            "author": "string",
+            "duration": 0,
+            "thumbnail": "string"
         }
+        // ...more
+    ]
+}
+```
+
+### 🔁 Related Songs
+
+**GET** `/relatedSongs/:currentSongId`
+
+Returns a list of songs related to the given song ID.
+
+```json
+{
+    "status": true,
+    "data": [
+        {
+            "id": "string",
+            "title": "string",
+            "author": "string",
+            "duration": 0,
+            "thumbnail": "string"
+        }
+        // ...more
+    ]
+}
+```
+
+### 🎵 Playlist Search
+
+**GET** `/playlists?q=<query>`
+
+Searches for playlists based on the query.
+
+```json
+{
+    "status": true,
+    "data": [
+        {
+            "id": "string",
+            "name": "string",
+            "thumbnail": "string"
+        }
+        // ...more
+    ]
+}
+```
+
+### 📁 Playlist Details
+
+**GET** `/playlists/:playlistId`
+
+Returns full details and all videos from a given playlist.
+
+```json
+{
+    "status": true,
+    "data": {
+        "title": "string",
+        "totalVideos": "string",
+        "thumnail": "string",
+        "videos": [
+            {
+                "id": "string",
+                "title": "string",
+                "author": "string",
+                "duration": 0,
+                "thumbnail": "string"
+            }
+            // ... more
+        ]
     }
-    ```
+}
+```
+
+### 📝 Get Song Lyrics
+
+**GET** `/lyrics/:musicId`
+
+Fetches the lyrics for the specified song by its ID.
+
+```json
+{
+    "status": true,
+    "data": "string"
+}
+```
