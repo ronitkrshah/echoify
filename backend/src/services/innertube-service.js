@@ -1,4 +1,4 @@
-const { Innertube, UniversalCache, YTNodes, YT } = require("youtubei.js");
+const { Innertube, YTNodes, ClientType } = require("youtubei.js");
 
 class InnertubeService {
     /** @type {Innertube | undefined} */
@@ -100,6 +100,15 @@ class InnertubeService {
         const random = Math.floor(Math.random * retVal.length);
 
         return [retVal[random]];
+    }
+
+    /**
+     * Return Lyrics
+     * @param {string} musicId
+     */
+    async getMusicLyrics(musicId) {
+        const list = await this.#_innertube.music.getLyrics(musicId);
+        return list?.description?.text;
     }
 
     /**

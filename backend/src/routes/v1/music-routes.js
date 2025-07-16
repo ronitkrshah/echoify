@@ -25,4 +25,9 @@ router.get(
     asyncRouteHandler(YTMusicController.getNextMusic)
 );
 
+router.get(
+    "/lyrics/:musicId",
+    asyncRouteHandler(YTMusicController.getMusicLyrics)
+);
+
 module.exports = router;

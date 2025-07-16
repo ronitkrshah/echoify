@@ -140,3 +140,17 @@ exports.getPlaylistInfo = async function (req, res) {
 
     res.status(StatusCodes.OK).json(successResponse(videos));
 };
+
+/**
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {Promise<void>}
+ */
+exports.getMusicLyrics = async function (req, res) {
+    const musicId = req.params?.musicId;
+    if (!musicId)
+        throw new AppError("No Playlist ID Provided", StatusCodes.BAD_REQUEST);
+    const videos = await InnertubeService.getMusicLyrics(musicId);
+
+    res.status(StatusCodes.OK).json(successResponse(videos));
+};
