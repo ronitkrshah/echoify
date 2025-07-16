@@ -7,6 +7,7 @@ class InnertubeService {
     async setupInnertube() {
         this.#_innertube = await Innertube.create({
             enable_session_cache: false,
+            client_type: ClientType.MUSIC,
         });
     }
 
