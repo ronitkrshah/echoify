@@ -128,7 +128,11 @@ class InnertubeService {
                 });
             } catch (error) {}
         }
-        return retVal;
+
+        /** Returning a random music */
+        const random = Math.floor(Math.random * retVal.length);
+
+        return [retVal[random]];
     }
 
     /**
