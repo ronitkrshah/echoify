@@ -28,11 +28,7 @@ export default function RecentSongsList() {
     try {
       loadingDialog.show("Fetching Streams");
       VirtualMusicPlayerService.setQueueType("NORMAL");
-      const firstFewRecents = await RecentsRepository.getLimitedMusicsAsync(0, 20);
-      await VirtualMusicPlayerService.playMusicAsync(
-        music,
-        firstFewRecents!.map((it) => Music.convertFromSongEntity(it))
-      );
+      await VirtualMusicPlayerService.playMusicAsync(music);
       navigation.push("PlayerControllerScreen");
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
