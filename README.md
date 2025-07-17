@@ -53,6 +53,12 @@ Because not everyone wants to clone repos and build like it’s a CS assignment:
 
 ---
 
+## ❓ FAQ
+
+**Q: Why is there a streaming delay or buffering?**  
+**A:** Chill. Just enable *Gawd Mode* from the app settings — it’ll take about a minute, but after that, buttery smooth playback.
+
+
 ## 🧪 Dev Notes (a.k.a Pain Log)
 
 Built with:
