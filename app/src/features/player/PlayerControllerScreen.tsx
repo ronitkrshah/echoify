@@ -22,17 +22,25 @@ export default function PlayerControllerScreen() {
 
   return (
     <Fragment>
-      <View style={{ ...styles.container, backgroundColor: theme.colors.elevation.level3 }}>
+      <View style={{ ...styles.container, backgroundColor: theme.colors.background }}>
         <View
           style={{
             ...styles.coverArtContainer,
-            borderColor: theme.colors.elevation.level1,
+            borderColor: theme.dark ? theme.colors.secondary : theme.colors.primaryContainer,
           }}
         >
           <Image source={{ uri: activeTrack?.artwork }} style={StyleSheet.absoluteFillObject} />
         </View>
 
-        <Surface style={{ borderRadius: 40, padding: 32, width: "100%", alignItems: "center" }}>
+        <Surface
+          style={{
+            borderRadius: 40,
+            padding: 32,
+            width: "100%",
+            alignItems: "center",
+            backgroundColor: theme.dark ? theme.colors.secondary : theme.colors.primaryContainer,
+          }}
+        >
           <View style={{ gap: 12 }}>
             <Text
               numberOfLines={1}
@@ -50,7 +58,7 @@ export default function PlayerControllerScreen() {
               variant="titleSmall"
               style={{
                 fontWeight: "bold",
-                color: theme.colors.onSurfaceDisabled,
+                color: theme.dark ? theme.colors.backdrop : theme.colors.onSurfaceDisabled,
                 textAlign: "center",
                 fontStyle: "italic",
               }}
@@ -62,12 +70,18 @@ export default function PlayerControllerScreen() {
           <View style={{ flexDirection: "row" }}>
             <IconButton
               icon={"playlist-plus"}
+              iconColor={theme.dark ? theme.colors.onPrimary : theme.colors.primary}
               onPress={() => {
                 setShowPlaylistAddDialog(true);
               }}
             />
-            <IconButton icon={"skip-previous"} onPress={() => TrackPlayer.skipToPrevious()} />
             <IconButton
+              iconColor={theme.dark ? theme.colors.onPrimary : theme.colors.primary}
+              icon={"skip-previous"}
+              onPress={() => TrackPlayer.skipToPrevious()}
+            />
+            <IconButton
+              iconColor={theme.dark ? theme.colors.onPrimary : theme.colors.primary}
               disabled={player.bufferingDuringPlay}
               loading={player.bufferingDuringPlay}
               onPress={async () => {
@@ -80,8 +94,16 @@ export default function PlayerControllerScreen() {
               animated
               icon={player.playing ? "pause" : "play"}
             />
-            <IconButton icon={"skip-next"} onPress={() => TrackPlayer.skipToNext()} />
-            <IconButton icon={"stop"} onPress={() => TrackPlayer.stop()} />
+            <IconButton
+              iconColor={theme.dark ? theme.colors.onPrimary : theme.colors.primary}
+              icon={"skip-next"}
+              onPress={() => TrackPlayer.skipToNext()}
+            />
+            <IconButton
+              iconColor={theme.dark ? theme.colors.onPrimary : theme.colors.primary}
+              icon={"stop"}
+              onPress={() => TrackPlayer.stop()}
+            />
           </View>
         </Surface>
       </View>
