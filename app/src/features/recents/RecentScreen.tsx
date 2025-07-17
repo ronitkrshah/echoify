@@ -73,10 +73,7 @@ export default function RecentScreen({ navigation }: TProps) {
         keyExtractor={(item, index) => `${item.id}_${item.songId}_${index}`}
         contentContainerStyle={{ paddingHorizontal: 8, gap: 16 }}
         renderItem={({ item, index }) => (
-          <Animated.View
-            style={{ borderRadius: 32, overflow: "hidden" }}
-            entering={FadeInDown.delay(index * 100)}
-          >
+          <Animated.View style={{ borderRadius: 32, overflow: "hidden" }} entering={FadeInDown}>
             <MusicListItem
               onPress={handleMusicPressAsync}
               music={Music.convertFromSongEntity(item)}
