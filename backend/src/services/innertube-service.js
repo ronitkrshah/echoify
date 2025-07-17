@@ -150,28 +150,27 @@ class InnertubeService {
      * @param {string} playlistId
      */
     async getPlaylistInfo(playlistId) {
-        const info = await this.#_innertube.getPlaylist(playlistId);
-
+        const info = await this.#_innertube.music.getPlaylist(playlistId);
+        // return info;
         const basicInfo = {
-            title: info.info.title,
-            totalVideos: info.info.total_items,
-            thumnail: info.info.thumbnails[0].url,
+            title: info.header.title.text,
+            thumnail: info.background?.contents?.[0].url,
         };
 
         const videos = [];
 
-        info.videos.forEach((it) => {
-            const video = it.as(YTNodes.PlaylistVideo);
+        for (const video of info.contents) {
+            if (!video?.id) continue;
             videos.push({
                 id: video.id,
-                title: video.title.text ?? "Unknown",
-                author: video.author.name,
-                duration: video.duration.seconds,
-                thumbnail: video.thumbnails[0].url,
+                title: video.title ?? "Unknown",
+                author: video.authors?.map((it) => it.name).join(", "),
+                duration: video?.duration?.seconds,
+                thumbnail: video.thumbnail?.contents?.[0].url || "",
             });
-        });
+        }
 
-        return { ...basicInfo, videos };
+        return { ...basicInfo, totalVideos: videos.length, videos };
     }
 }
 
