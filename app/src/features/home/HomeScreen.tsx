@@ -87,7 +87,7 @@ export default function HomeScreen({ navigation }: TProps) {
         entering={FadeInDown.duration(400)}
         style={{ position: "absolute", width: _screenWidth, bottom: 0, left: 0 }}
       >
-        <CurrentPlayingMusicOverlay />
+        <CurrentPlayingMusicOverlay onPress={() => navigation.push("PlayerControllerScreen")} />
       </Animated.View>
     </SafeAreaView>
   );

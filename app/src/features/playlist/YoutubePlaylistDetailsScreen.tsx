@@ -9,7 +9,6 @@ import { Music } from "~/models";
 import { TStackNavigationRoutes } from "~/navigation";
 import { VirtualMusicPlayerService } from "~/services";
 import { MusicListItem } from "../__shared__/components";
-import { usePlayerController } from "~/core/playerController";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TPlaylistDetails } from "~/types";
 
@@ -19,14 +18,13 @@ export default function YoutubePlaylistDetailsScreen({ navigation, route }: TPro
   const [playlistDetails, setPlaylistDetails] = useState<TPlaylistDetails>();
   const theme = useTheme();
   const loadingDialog = useLoadingDialog();
-  const playerController = usePlayerController();
 
   async function handleMusicPressAsync(music: Music) {
     try {
       loadingDialog.show("Fetching Streams");
       VirtualMusicPlayerService.setQueueType("PLAYLIST");
       await VirtualMusicPlayerService.playMusicAsync(music, playlistDetails?.videos);
-      playerController.showModal();
+      navigation.push("PlayerControllerScreen");
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     } finally {

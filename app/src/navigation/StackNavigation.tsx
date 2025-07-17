@@ -5,6 +5,7 @@ import { SearchResultsScreen, SearchScreen } from "~/features/search";
 import { useTheme } from "react-native-paper";
 import { PlaylistDetailsScreen, YoutubePlaylistDetailsScreen } from "~/features/playlist";
 import { SplashScreen } from "~/features/splash";
+import { PlayerControllerScreen } from "~/features/player";
 
 export type TStackNavigationRoutes = {
   SplashScreen: undefined;
@@ -15,6 +16,8 @@ export type TStackNavigationRoutes = {
 
   SearchScreen: undefined;
   SearchResultsScreen: { query: string };
+
+  PlayerControllerScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<TStackNavigationRoutes>();
@@ -35,6 +38,7 @@ export default function StackNavigation() {
       <Stack.Screen name="SearchResultsScreen" component={SearchResultsScreen} />
       <Stack.Screen name="PlaylistDetailsScreen" component={PlaylistDetailsScreen} />
       <Stack.Screen name="YoutubePlaylistDetailsScreen" component={YoutubePlaylistDetailsScreen} />
+      <Stack.Screen name="PlayerControllerScreen" component={PlayerControllerScreen} />
     </Stack.Navigator>
   );
 }

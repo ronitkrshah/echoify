@@ -2,18 +2,27 @@ import { Fragment, useEffect, useState } from "react";
 import { ScrollView, ToastAndroid, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import { SkeletonLoader, useLoadingDialog } from "~/core/components";
-import { usePlayerController } from "~/core/playerController";
 import { VirtualMusicPlayerService } from "~/services";
 import { MusicListItem } from "~/features/__shared__/components";
 import { Music } from "~/models";
 import RecentsRepository from "~/repositories/RecentsRepository";
 import { SongEntity } from "~/database/entities";
+import { CompositeNavigationProp, useNavigation } from "@react-navigation/native";
+import { NativeBottomTabNavigationProp } from "@bottom-tabs/react-navigation";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
+import { TStackNavigationRoutes } from "~/navigation";
+
+type TNavigation = CompositeNavigationProp<
+  NativeBottomTabNavigationProp<TBottomTabRoutes, "HomeScreen">,
+  NativeStackNavigationProp<TStackNavigationRoutes>
+>;
 
 export default function RecentSongsList() {
   const [recentMusics, setRecentMusics] = useState<SongEntity[] | undefined>(undefined);
   const theme = useTheme();
   const loadingDialog = useLoadingDialog();
-  const playerController = usePlayerController();
+  const navigation = useNavigation<TNavigation>();
 
   async function handleMusicPressAsync(music: Music) {
     try {
@@ -24,7 +33,7 @@ export default function RecentSongsList() {
         music,
         firstFewRecents!.map((it) => Music.convertFromSongEntity(it))
       );
-      playerController.showModal();
+      navigation.push("PlayerControllerScreen");
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     } finally {

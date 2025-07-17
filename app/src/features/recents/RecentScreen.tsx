@@ -13,7 +13,6 @@ import { Music } from "~/models";
 import { Text, useTheme } from "react-native-paper";
 import { useLoadingDialog } from "~/core/components";
 import { VirtualMusicPlayerService } from "~/services";
-import { usePlayerController } from "~/core/playerController";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type TProps = CompositeScreenProps<
@@ -28,13 +27,12 @@ export default function RecentScreen({ navigation }: TProps) {
   const theme = useTheme();
 
   const loadingDialog = useLoadingDialog();
-  const playerController = usePlayerController();
 
   async function handleMusicPressAsync(music: Music) {
     try {
       loadingDialog.show("Fetching Streams");
       await VirtualMusicPlayerService.playMusicAsync(music);
-      playerController.showModal();
+      navigation.push("PlayerControllerScreen");
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     } finally {

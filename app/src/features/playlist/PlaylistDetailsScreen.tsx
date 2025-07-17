@@ -11,7 +11,6 @@ import { sleepThreadAsync } from "~/core/utils";
 import { MusicListItem } from "../__shared__/components";
 import { Music } from "~/models";
 import { VirtualMusicPlayerService } from "~/services";
-import { usePlayerController } from "~/core/playerController";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "PlaylistDetailsScreen">;
@@ -25,7 +24,6 @@ export default function PlaylistDetailsScreen({ navigation, route }: TProps) {
 
   const loadingDialog = useLoadingDialog();
   const alertDialog = useAlertDialog();
-  const playerController = usePlayerController();
   const theme = useTheme();
 
   function deletePlaysist(id: number) {
@@ -34,9 +32,9 @@ export default function PlaylistDetailsScreen({ navigation, route }: TProps) {
       description: `Are you sure to delete playlist ${playlistInfo?.name}?`,
       confirmText: "YES I'M SURE",
       async onConfirm() {
-        loadingDialog.show()
+        loadingDialog.show();
         await LocalPlaylistRepository.deletePlaylistAsync(route.params.playlistId);
-        loadingDialog.dismiss()
+        loadingDialog.dismiss();
         navigation.goBack();
       },
     });
@@ -50,7 +48,7 @@ export default function PlaylistDetailsScreen({ navigation, route }: TProps) {
         music,
         playlistInfo?.songs.map((it) => Music.convertFromSongEntity(it))
       );
-      playerController.showModal();
+      navigation.push("PlayerControllerScreen");
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     } finally {

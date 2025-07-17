@@ -35,6 +35,7 @@ class MusicPlayerService {
     try {
       await TrackPlayer.updateOptions({
         ratingType: RatingType.Heart,
+        progressUpdateEventInterval: 1000,
         android: {
           alwaysPauseOnInterruption: true,
           appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,

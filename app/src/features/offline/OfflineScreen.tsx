@@ -13,7 +13,6 @@ import { TStackNavigationRoutes } from "~/navigation";
 import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { VirtualMusicPlayerService } from "~/services";
-import { usePlayerController } from "~/core/playerController";
 import * as Sharing from "expo-sharing";
 import { useDebounce } from "~/hooks";
 
@@ -40,7 +39,6 @@ export default function OfflineScreen({ navigation }: TProps) {
   const debouncedSearch = useDebounce(seach, 400);
 
   const theme = useTheme();
-  const playerController = usePlayerController();
 
   async function askForPermissionAsync() {
     const status = await Media.requestPermissionsAsync(false, ["audio"]);
@@ -91,7 +89,7 @@ export default function OfflineScreen({ navigation }: TProps) {
             )
         )
       );
-      playerController.showModal();
+      navigation.push("PlayerControllerScreen");
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     }

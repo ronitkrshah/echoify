@@ -13,7 +13,6 @@ import { VirtualMusicPlayerService } from "~/services";
 import { Database } from "~/database";
 import { PlaylistEntity, SongEntity } from "~/database/entities";
 import { MusicListItem } from "../__shared__/components";
-import { usePlayerController } from "~/core/playerController";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type TProps = NativeStackScreenProps<TStackNavigationRoutes, "SearchResultsScreen">;
@@ -23,7 +22,6 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
 
   const loadingDialog = useLoadingDialog();
   const theme = useTheme();
-  const playerController = usePlayerController();
 
   useEffect(() => {
     HostedBackendApi.searchMusicsAsync(route.params.query).then(setSearchResult);
@@ -33,8 +31,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
     const activeTrack = await TrackPlayer.getActiveTrack();
     if (activeTrack) {
       if (activeTrack.id === music.videoId) {
-        // This track is already playing
-        playerController.showModal();
+        navigation.push("PlayerControllerScreen");
         return;
       }
     }
@@ -43,7 +40,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
       loadingDialog.show("Fetching Streams");
       VirtualMusicPlayerService.setQueueType("NORMAL");
       await VirtualMusicPlayerService.playMusicAsync(music);
-      playerController.showModal();
+      navigation.push("PlayerControllerScreen");
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     } finally {

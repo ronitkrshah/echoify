@@ -5,10 +5,19 @@ import { SkeletonLoader, useLoadingDialog } from "~/core/components";
 import { MusicListItem } from "~/features/__shared__/components";
 import { Music } from "~/models";
 import { VirtualMusicPlayerService } from "~/services";
-import { usePlayerController } from "~/core/playerController";
 import { HostedBackendApi } from "~/api";
 import moment from "moment";
 import * as Localization from "expo-localization";
+import { NativeBottomTabNavigationProp } from "@bottom-tabs/react-navigation";
+import { CompositeNavigationProp, useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { TStackNavigationRoutes } from "~/navigation";
+import { TBottomTabRoutes } from "~/navigation/BottomTabNavigation";
+
+type TNavigation = CompositeNavigationProp<
+  NativeBottomTabNavigationProp<TBottomTabRoutes, "HomeScreen">,
+  NativeStackNavigationProp<TStackNavigationRoutes>
+>;
 
 const _year = moment().format("YYYY");
 const _countryCodeBasedQueryTemplates: Record<string, string> = {
@@ -66,9 +75,9 @@ const _countryCodeBasedQueryTemplates: Record<string, string> = {
 export default function TrendingSongsList() {
   const [trendingMusics, setTrendingMusics] = useState<Music[] | undefined>(undefined);
   const loadingDialog = useLoadingDialog();
-  const playerController = usePlayerController();
   const chunkedData = chunkArray(trendingMusics ?? [], 3);
   const theme = useTheme();
+  const navigation = useNavigation<TNavigation>();
 
   function chunkArray(arr: Music[], size: number) {
     return Array.from({ length: Math.ceil(arr.length / size) }, (_, index) =>
@@ -81,7 +90,7 @@ export default function TrendingSongsList() {
       loadingDialog.show("Fetching Streams");
       VirtualMusicPlayerService.setQueueType("PLAYLIST");
       await VirtualMusicPlayerService.playMusicAsync(music, trendingMusics);
-      playerController.showModal();
+      navigation.push("PlayerControllerScreen");
     } catch (error) {
       ToastAndroid.show((error as Error).message, ToastAndroid.SHORT);
     } finally {
