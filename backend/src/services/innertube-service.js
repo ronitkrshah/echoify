@@ -97,7 +97,7 @@ class InnertubeService {
         }
 
         /** Returning a random music */
-        const random = Math.floor(Math.random * retVal.length);
+        const random = Math.floor(Math.random() * retVal.length);
 
         return [retVal[random]];
     }
