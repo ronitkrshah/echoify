@@ -19,7 +19,6 @@ import { HostedBackendApi } from "~/api";
  */
 class VirtualMusicPlayerService {
   private _queue: Music[] = [];
-  private _playedSongs = new Set<string>();
 
   private _queueType: "PLAYLIST" | "NORMAL" = "NORMAL";
   private _isEventProcessing = false;
@@ -81,32 +80,21 @@ class VirtualMusicPlayerService {
   }
 
   private async getNextTrackFromQueueListAsync(currentTrackId: string) {
-    let nextMusic: Music | undefined;
+    const currentIndex = this._queue.findIndex((it) => it.videoId === currentTrackId);
+    if (currentIndex === -1 || currentIndex >= this._queue.length - 1) return;
 
-    // Expensive Func :)
-    this._queue.forEach((it, index) => {
-      if (it.videoId !== currentTrackId) return;
-      if (index === this._queue.length - 1) return;
-
-      nextMusic = this._queue[index + 1];
-    });
-    if (nextMusic) return await this.getRNTPTrackFromMusicAsync(nextMusic);
+    const nextMusic = this._queue[currentIndex + 1];
+    return this.getRNTPTrackFromMusicAsync(nextMusic);
   }
 
   /** This method will not update actual track player queue */
   public addMusicsToQueue(musics: Music[]) {
-    const songsWithoutDuplicates = musics.filter((it) => {
-      if (this._playedSongs.has(it.videoId)) return false;
-      this._playedSongs.add(it.videoId);
-      return true;
-    });
-    this._queue = [...this._queue, ...songsWithoutDuplicates];
+    this._queue.push(...musics);
   }
 
   /** This method will also clear queue in TrackPlayer */
   public async resetAsync() {
     this._queueType = "NORMAL";
-    this._playedSongs.clear();
     this._queue = [];
     await TrackPlayer.reset();
   }
