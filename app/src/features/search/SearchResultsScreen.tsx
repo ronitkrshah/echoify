@@ -48,42 +48,6 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
     }
   }
 
-  async function handleSongAddToPlaylist(music: Music) {
-    try {
-      const songRepo = Database.datasource.getRepository(SongEntity);
-      const playListRepo = Database.datasource.getRepository(PlaylistEntity);
-
-      // Step 1: Create and save the new song
-      const newSong = songRepo.create({
-        title: music.title,
-        duration: music.duration,
-        songId: music.videoId,
-        thumbnail: music.thumbnail,
-        uploadedBy: music.author,
-      });
-      const addedSong = await songRepo.save(newSong);
-
-      // Step 2: Load the playlist with its current songs
-      const playlist = await playListRepo.findOne({
-        where: { id: 1 }, // or whatever ID you want
-        relations: ["songs"], // important: load related songs
-      });
-
-      if (!playlist) return;
-
-      // Step 3: Add the new song if it's not already in the playlist
-      const alreadyExists = playlist.songs.some((song) => song.songId === addedSong.songId);
-      if (!alreadyExists) {
-        playlist.songs.push(addedSong);
-        await playListRepo.save(playlist); // this handles the join table
-      }
-
-      ToastAndroid.show("ADDED TO PLAYLIST", ToastAndroid.SHORT);
-    } catch (error) {
-      console.log("Failed to add song to playlist:", error);
-    }
-  }
-
   return (
     <SafeAreaView style={{ paddingHorizontal: 16, gap: 16, flex: 1 }}>
       <Pressable
@@ -105,7 +69,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
 
       <Animated.FlatList
         data={searchResult.splice(4, searchResult.length - 1)}
-        keyExtractor={(item) => item.videoId}
+        keyExtractor={(item, index) => item.videoId + index}
         ListHeaderComponent={() => {
           if (searchResult.length === 0) return null;
           return (
@@ -139,7 +103,7 @@ export default function SearchResultsScreen({ route, navigation }: TProps) {
                   return (
                     <Animated.View
                       entering={FadeIn.delay(300 + index * 100)}
-                      key={it.videoId}
+                      key={it.videoId + index}
                       style={{ borderRadius: 32, overflow: "hidden", width: "50%" }}
                     >
                       <Pressable

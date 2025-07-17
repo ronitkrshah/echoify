@@ -20,19 +20,6 @@ export default function PlayerControllerScreen() {
   const player = useIsPlaying();
   const theme = useTheme();
 
-  useEffect(() => {
-    const progressSubscription = TrackPlayer.addEventListener(
-      Event.PlaybackProgressUpdated,
-      (e) => {
-        console.log(e);
-      }
-    );
-
-    return () => {
-      progressSubscription.remove();
-    };
-  }, []);
-
   return (
     <Fragment>
       <View style={{ ...styles.container, backgroundColor: theme.colors.elevation.level3 }}>

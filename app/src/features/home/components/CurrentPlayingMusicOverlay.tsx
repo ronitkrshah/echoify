@@ -1,4 +1,5 @@
 import Animated, {
+  cancelAnimation,
   Easing,
   FadeInDown,
   FadeOut,
@@ -36,6 +37,8 @@ export default function CurrentPlayingMusicOverlay({ onPress }: TProps) {
     } else {
       rotation.value = withSpring(rotation.value);
     }
+
+    return () => cancelAnimation(rotation);
   }, [playbackState.state]);
 
   const spinningStyle = useAnimatedStyle(() => {

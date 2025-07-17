@@ -31,6 +31,7 @@ export default function RecentScreen({ navigation }: TProps) {
   async function handleMusicPressAsync(music: Music) {
     try {
       loadingDialog.show("Fetching Streams");
+      VirtualMusicPlayerService.setQueueType("NORMAL");
       await VirtualMusicPlayerService.playMusicAsync(music);
       navigation.push("PlayerControllerScreen");
     } catch (error) {
