@@ -81,7 +81,7 @@ export default function CurrentPlayingMusicOverlay({ onPress }: TProps) {
             {activeTrack.title}
           </Text>
           {activeTrack.artist && (
-            <Text variant="labelSmall" style={{ fontStyle: "italic" }}>
+            <Text variant="labelSmall" numberOfLines={1} style={{ fontStyle: "italic" }}>
               {activeTrack.artist}
             </Text>
           )}
