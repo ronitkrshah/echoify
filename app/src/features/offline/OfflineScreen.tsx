@@ -178,10 +178,7 @@ export default function OfflineScreen({ navigation }: TProps) {
           }
         }}
         renderItem={({ item, index }) => (
-          <Animated.View
-            style={{ borderRadius: 32, overflow: "hidden" }}
-            entering={FadeInDown.delay(index * 100)}
-          >
+          <Animated.View style={{ borderRadius: 32, overflow: "hidden" }} entering={FadeInDown}>
             <MusicListItem
               holdOptions={_holdOptions}
               onPress={handleMusicPressAsync}
